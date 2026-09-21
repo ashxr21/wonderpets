@@ -16,7 +16,7 @@ DB Admin: AGLIPAY, Rozzelle Anne M.
 
 
 
-Dev: Largo, Althea Loribel C.
+Dev: LARGO, Althea Loribel C.
 
 
 
