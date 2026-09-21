@@ -1,6 +1,6 @@
 # wonderpets
 Scrum Master: Sapurna, Asher D.
 UI Designer:
-DB Admin:
+DB Admin: Aglipay, Rozzelle Anne M.
 Dev:
 Tester:
