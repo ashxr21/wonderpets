@@ -2,7 +2,7 @@
 
 
 
-Scrum Master: Sapurna, Asher D.
+Scrum Master: SAPURNA, Asher D.
 
 
 
