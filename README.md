@@ -3,5 +3,5 @@ Scrum Master: Sapurna, Asher D.
 UI Designer:
 DB Admin: Aglipay, Rozzelle Anne M.
 Dev: Largo, Althea Loribel C.
-Tester:
+Tester: Diego, Arhiana A.
 
