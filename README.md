@@ -21,5 +21,5 @@ Dev: Largo, Althea Loribel
 
 
 
-Tester: Diego, Arhiana A.
+Tester: Diego, Arhiana A. 
 
