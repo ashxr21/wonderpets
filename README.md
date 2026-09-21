@@ -12,7 +12,6 @@ UI Designer: Fadrilan, Merlyn Angel C.
 
 
 
-DB Admin: Aglipay, Rozzelle Anne M.
 
 
 
