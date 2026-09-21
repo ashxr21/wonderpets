@@ -7,7 +7,7 @@ Scrum Master: SAPURNA, Asher D.
 
 
 
-UI Designer: Fadrilan, Merlyn Angel C. 
+UI Designer: FADRILAN, Merlyn Angel C. 
 
 
 
