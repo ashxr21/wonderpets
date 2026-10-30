@@ -35,7 +35,44 @@
 
         <!-- TODO: Dashboard View-->
             <!-- Code here -->
+            <div id="dashboard">
+                <div class="dash-layout">
+                    <!--Sidebar Nav-->
+                    <aside class="sidebar">
+                        <div class="sidebar-header">
+                            <div class="H">H</div>
+                            <span>Hope, Inc. ERP</span>
+                        </div>
+                        <nav class="sidebar-nav" id="sidebarNav">
+                            <!--* Dynamically populated via JavaScript based on user permissions -->
+                        </nav>
+                        <div class="sidebar-footer">
+                            <div class="user-info" onclick="logout()">
+                                <div class="user-avatar" id="userAvatar">U</div>
+                                <div class="user-details">
+                                    <div class="name" id="userName">User</div>
+                                    <div class="role" id="userRoleLabel">User</div>
+                                </div> 
+                                <span style="opacity:0.5;font-size:0.8rem;">Logout</span>
+                                </div>
+                            </div>
+                        </div>
+                    </aside>
 
+                    <!--* Main Content Area-->
+                    <div class="main-content">
+                        <header class="topbar">
+                            <div class="topbar-title" id="pageTitle">Dashboard</div>
+                            <div class="topbar-actions">
+                                <span class="role-badge" id="roleBadge">User</span>
+                            </div>
+                        </header>
+                        <div class="content-area" id="contentArea">
+                            <!--Active module tables and stats panels load here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
 
         <!-- TODO: Login Modal -->
             <!-- Code here -->
