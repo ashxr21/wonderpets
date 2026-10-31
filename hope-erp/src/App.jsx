@@ -1,122 +1,49 @@
-import { useState } from 'react'
-import heroImg from './assets/hero.png'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import './App.css'
+import { useEffect, useState } from 'react'
+import { useAuth } from './context/AuthContext'
+import LandingPage from './components/landing/LandingPage'
+import DashboardLayout from './components/dashboard/DashboardLayout'
+import LoginModal from './components/auth/LoginModal'
+import RegisterModal from './components/auth/RegisterModal'
+import ResetModal from './components/auth/ResetModal'
 
-function App() {
-  const [count, setCount] = useState(0)
-
+// Fixed gradient backdrop + two decorative orbs (replaces body background / ::before / ::after)
+function Background() {
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
-
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
+    <div aria-hidden className="pointer-events-none fixed inset-0 -z-10 overflow-hidden
+      bg-[radial-gradient(900px_600px_at_8%_10%,rgba(143,176,255,.75),transparent_60%),radial-gradient(800px_600px_at_95%_15%,rgba(176,160,255,.65),transparent_60%),radial-gradient(900px_700px_at_70%_100%,rgba(120,200,255,.55),transparent_60%),linear-gradient(160deg,#e9f0ff_0%,#dbe6fb_50%,#e6e3fb_100%)] print:hidden">
+      <div className="absolute -bottom-20 -left-[120px] h-[380px] w-[380px] rounded-full border border-white/70
+        bg-linear-to-br from-white/70 to-[rgba(140,170,255,.25)] blur-[2px]" />
+      <div className="absolute top-[40%] -right-[60px] h-[260px] w-[260px] rounded-full border border-white/70
+        bg-linear-to-br from-white/65 to-[rgba(170,150,255,.25)] blur-[2px]" />
+    </div>
   )
 }
 
-export default App
+export default function App() {
+  const { currentUser } = useAuth()
+  const [modal, setModal] = useState(null) // null | 'login' | 'register' | 'reset'
+
+  // Close any open auth modal once the user is signed in
+  useEffect(() => {
+    if (currentUser) setModal(null)
+  }, [currentUser])
+
+  const close = () => setModal(null)
+
+  return (
+    <div className="min-h-screen font-sans leading-[1.55] text-[#1d2a4d]">
+      <Background />
+
+      {currentUser ? (
+        <DashboardLayout />
+      ) : (
+        <>
+          <LandingPage onOpen={setModal} />
+          <LoginModal open={modal === 'login'} onClose={close} onSwitch={setModal} />
+          <RegisterModal open={modal === 'register'} onClose={close} onSwitch={setModal} />
+          <ResetModal open={modal === 'reset'} onClose={close} onSwitch={setModal} />
+        </>
+      )}
+    </div>
+  )
+}
