@@ -4,7 +4,7 @@ export const glass =
 
 export const grading = 'bg-linear-to-br from-[#6a93f5] to-[#8b8cf7]'
 
-export const input Cls = 
+export const inputCls = 
   'w-full rounded-[14 px] border border-[rgba(120,145,210,.3)] bg-white/65 px-3.5 py-3 ' +
   'text-[.95rem] font-medium text-[#1d2a4d] transition placeholder:text-[#6679a3]/60 ' +
   'focus:outline-none focus:bg-white focus:border-[#5b86f0] focus:ring-4 focus:ring-[#5b86f0]/20 ' +
