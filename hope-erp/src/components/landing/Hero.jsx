@@ -41,7 +41,7 @@ export default function Hero({ onOpen }) {
             {modules.map((m) => (
                <div key={m.title} className="flex flex-col gap-2 rounded-[14px] border border-white/75 bg-white/70 p-[18px] text-left">
                  <div className={`flex h-[42px] w-[42px] items-center justify-center rounded-[13px] text-[1.2rem] ${m.color}`}>{m.icon}</div>
-                 <h4 className="text-[.95rem] font-bold">{m.title}</h4>
+                 <h4 className="text-[.95rem] font-bold">{m.title}/h4>
                  <p className="text-[.78rem] text-[#6679a3]">{m.text}</p>
                </div>
              ))}
