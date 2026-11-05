@@ -144,7 +144,11 @@ export default function RecordManager({
   return (
     <>
       <div className="mb-[18px] flex flex-wrap items-center justify-between gap-3 print:hidden">
-        {title && <h3 className="text-[1.3rem] font-extrabold">{title}</h3>}
+        {title && (
+          <h3 className={`font-extrabold tracking-[-.04em] ${title === 'Product Management' ? 'text-[2.2rem] leading-none text-[#1d2a4d]' : 'text-[1.3rem]'}`}>
+            {title}
+          </h3>
+        )}
         <div className="ml-auto flex flex-wrap items-center gap-2.5">
           <input
             className="min-w-[200px] rounded-full border border-[rgba(120,145,210,.3)] bg-white/65 px-4 py-2.5 text-[.88rem]

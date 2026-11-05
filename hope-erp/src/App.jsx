@@ -39,6 +39,9 @@ function Background() {
         ) : (
             <>
             <LandingPage onOpen={setModal} />
+            <div className="fixed bottom-6 right-6 z-20 flex h-12 w-12 items-center justify-center rounded-full border border-white/80 bg-linear-to-br from-[#f7d4f1] via-[#d4dcff] to-[#a7d0ff] shadow-[0_14px_30px_-12px_rgba(128,126,222,.7)] text-lg font-bold text-[#3657d7] backdrop-blur-sm">
+                ✦
+            </div>
             <LoginModal open={modal === 'login'} onClose={close} onSwitch={setModal} />
             <RegisterModal open={modal === 'register'} onClose={close} onSwitch={setModal} />
             <ResetModal open={modal === 'reset'} onClose={close} onSwitch={setModal} />

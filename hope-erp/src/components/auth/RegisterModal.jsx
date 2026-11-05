@@ -54,3 +54,11 @@ function RegisterForm({ onSwitch }) {
     </>
   )
 }
+
+export default function RegisterModal({ open, onClose, onSwitch }) {
+  return (
+    <Modal open={open} onClose={onClose} title="Create an account" subtitle="Register for a Hope, Inc. ERP account">
+      <RegisterForm onSwitch={onSwitch} />
+    </Modal>
+  )
+}

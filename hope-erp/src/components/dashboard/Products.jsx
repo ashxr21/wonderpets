@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useLocalStorage } from '../../hooks/useLocalStorage'
-import { KEYS, DEFAULT_PRODUCTS, DEFAULT_PRICES } from '../../data/default'
+import { KEYS, DEFAULT_PRODUCTS, DEFAULT_PRICES } from '../../data/defaults'
 import RecordManager from '../ui/RecordManager'
 import ActionButton from '../ui/ActionButton'
 import Modal from '../ui/Modal'
