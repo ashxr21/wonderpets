@@ -1,10 +1,9 @@
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 import { useAuth } from '../../context/AuthContext'
-import { readStore } from '../../utils/storage'
+import { useERPData } from '../../hooks/useERPData'
 import { computeSales, money, priceFor } from '../../utils/pricing'
 import {
-    KEYS, DEFAULT_CUSTOMERS, DEFAULT_PRODUCTS, DEFAULT_PRICES, DEFAULT_EMPLOYEES,
-    DEFAULT_JOBS, DEFAULT_DEPTS, DEFAULT_JOB_HISTORY, DEFAULT_SALES, DEFAULT_SALES_DETAIL,
+    KEYS,
     } from '../../data/defaults'
     import Button from '../ui/Button'
     import Tabs from '../ui/Tabs'
@@ -13,40 +12,41 @@ import {
     import { inputCls, glass } from '../ui/styles'
 
     const REPORTS = [
-    { id: 'topCustomers', perm: 'reports.topCustomers', label: 'Top Customers' },
-    { id: 'productMaster', perm: 'reports.productMaster', label: 'Product Master' },
-    { id: 'topProducts', perm: 'reports.topProducts', label: 'Top Products' },
-    { id: 'activeEmployees', perm: 'reports.activeEmployees', label: 'Active Employees' },
-    { id: 'allEmployees', perm: 'reports.allEmployees', label: 'All Employees' },
-    { id: 'empJobHistory', perm: 'reports.empJobHistory', label: 'Employee Job History' },
-    { id: 'topSales', perm: 'reports.topSales', label: 'Top Sales' },
+    { id: 'topCustomers', perm: 'reports.topCustomers', label: 'Top Customers', dataPerms: ['sales.view', 'customers.view', 'products.view'] },
+    { id: 'productMaster', perm: 'reports.productMaster', label: 'Product Master', dataPerms: ['products.view'] },
+    { id: 'topProducts', perm: 'reports.topProducts', label: 'Top Products', dataPerms: ['sales.view', 'products.view'] },
+    { id: 'activeEmployees', perm: 'reports.activeEmployees', label: 'Active Employees', dataPerms: ['hr.view'] },
+    { id: 'allEmployees', perm: 'reports.allEmployees', label: 'All Employees', dataPerms: ['hr.view'] },
+    { id: 'empJobHistory', perm: 'reports.empJobHistory', label: 'Employee Job History', dataPerms: ['hr.view'] },
+    { id: 'topSales', perm: 'reports.topSales', label: 'Top Sales', dataPerms: ['sales.view', 'customers.view', 'products.view', 'hr.view'] },
     ]
 
     const GENDER = { M: 'Male', F: 'Female', O: 'Other' }
 
     export default function Reports() {
     const { can } = useAuth()
-    const available = REPORTS.filter((r) => can(r.perm))
+    const { collections } = useERPData()
+    const available = REPORTS.filter((r) => can(r.perm) && r.dataPerms.every(can))
     const [active, setActive] = useState(available[0]?.id)
     const [histEmp, setHistEmp] = useState('all')
 
-    const d = useMemo(() => ({
-        customers: readStore(KEYS.customers, DEFAULT_CUSTOMERS),
-        products: readStore(KEYS.products, DEFAULT_PRODUCTS),
-        prices: readStore(KEYS.prices, DEFAULT_PRICES),
-        employees: readStore(KEYS.employees, DEFAULT_EMPLOYEES),
-        jobs: readStore(KEYS.jobs, DEFAULT_JOBS),
-        depts: readStore(KEYS.depts, DEFAULT_DEPTS),
-        history: readStore(KEYS.jobHistory, DEFAULT_JOB_HISTORY),
-        sales: readStore(KEYS.sales, DEFAULT_SALES),
-        details: readStore(KEYS.salesDetail, DEFAULT_SALES_DETAIL),
-    }), [])
+    const d = {
+        customers: collections[KEYS.customers],
+        products: collections[KEYS.products],
+        prices: collections[KEYS.prices],
+        employees: collections[KEYS.employees],
+        jobs: collections[KEYS.jobs],
+        depts: collections[KEYS.depts],
+        history: collections[KEYS.jobHistory],
+        sales: collections[KEYS.sales],
+        details: collections[KEYS.salesDetail],
+    }
 
     if (available.length === 0) {
         return (
         <div className={`${glass} rounded-[22px] p-6`}>
             <h3 className="mb-2 text-[1.05rem] font-extrabold">Reports</h3>
-            <p>You don't have access to any reports yet. Ask an administrator to assign rights.</p>
+            <p>Ask an administrator to assign report rights and view access to the underlying ERP modules.</p>
         </div>
         )
     }

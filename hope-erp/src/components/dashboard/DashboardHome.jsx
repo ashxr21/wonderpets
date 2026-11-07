@@ -1,12 +1,8 @@
 import { useAuth } from '../../context/AuthContext'
+import { useERPData } from '../../hooks/useERPData'
 import { glass } from '../ui/styles'
-
-const stats = [
-  { label: 'Total Customers', value: '4', change: 'Active accounts' },
-  { label: 'Products', value: '5', change: 'Catalog items' },
-  { label: 'Open Orders', value: '3', change: 'Sales pipeline' },
-  { label: 'Revenue (MTD)', value: '$12.4k', change: '↑ 18% vs last month' },
-]
+import { money } from '../../utils/pricing'
+import { KEYS } from '../../data/defaults'
 
 const shortcuts = [
   { id: 'customers', label: '👥 Customers' },
@@ -18,6 +14,27 @@ const shortcuts = [
 
 export default function DashboardHome({ onNavigate }) {
   const { currentUser } = useAuth()
+  const { collections } = useERPData()
+  const customers = collections[KEYS.customers]
+  const products = collections[KEYS.products]
+  const sales = collections[KEYS.sales]
+  const payments = collections[KEYS.payments]
+  const month = new Date().toISOString().slice(0, 7)
+  const monthPayments = payments.filter(
+    (payment) => !payment.isDeleted && payment.payDate?.startsWith(month)
+  )
+  const revenue = monthPayments.reduce((total, payment) => total + Number(payment.amount || 0), 0)
+  const stats = [
+    { label: 'Customers', value: customers.filter((record) => !record.isDeleted).length, change: 'From Supabase' },
+    { label: 'Products', value: products.filter((record) => !record.isDeleted).length, change: 'From Supabase' },
+    { label: 'Sales Records', value: sales.filter((record) => !record.isDeleted).length, change: 'From Supabase' },
+    {
+      label: 'Revenue (MTD)',
+      value: money(revenue),
+      change: revenue > 0 ? 'From Supabase payments' : 'No sales this month',
+    },
+  ]
+
   return (
     <>
       <div
@@ -25,7 +42,7 @@ export default function DashboardHome({ onNavigate }) {
           bg-linear-to-br from-[rgba(91,134,240,.92)] to-[rgba(139,124,246,.88)]
           shadow-[0_24px_50px_-20px_rgba(70,100,220,.7)]"
       >
-        <h2 className="mb-1.5 text-[1.6rem] font-extrabold">Welcome back, {currentUser.firstName}!</h2>
+        <h2 className="mb-1.5 text-[1.6rem] font-extrabold">Welcome back, {currentUser.firstName || currentUser.name}!</h2>
         <p>Here is your enterprise overview and quick management shortcuts.</p>
       </div>
 

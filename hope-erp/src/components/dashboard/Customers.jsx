@@ -1,5 +1,5 @@
 import MasterDataModule from './MasterDataModule'
-import { KEYS, DEFAULT_CUSTOMERS } from '../../data/defaults'
+import { KEYS } from '../../data/defaults'
 
 const fields = [
   { name: 'custNo', label: 'Customer No.', short: 'Cust No', placeholder: 'e.g. C-001', readOnlyOnEdit: true },
@@ -12,7 +12,7 @@ export default function Customers() {
   return (
     <MasterDataModule
       title="Customer Management" singular="Customer"
-      storageKey={KEYS.customers} defaults={DEFAULT_CUSTOMERS}
+      storageKey={KEYS.customers}
       fields={fields} keyOf={(r) => r.custNo}
       perms={{ add: 'customers.add', edit: 'customers.edit', delete: 'customers.delete' }}
     />

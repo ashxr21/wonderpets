@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { useAuth } from '../../context/AuthContext'
-import { useLocalStorage } from '../../hooks/useLocalStorage'
+import { useERPCollection } from '../../hooks/useERPData'
 import { makeStamp } from '../../utils/stamp'
 import Button from '../ui/Button'
 import Modal from '../ui/Modal'
@@ -46,9 +46,9 @@ function RecordForm({ fields, keyField, singular, mode, record, error, onSubmit,
   )
 }
 
-export default function MasterDataModule({ title, singular, permPrefix, storageKey, defaults, fields, keyField }) {
+export default function MasterDataModule({ title, singular, permPrefix, storageKey, fields, keyField }) {
   const { can, currentUser } = useAuth()
-  const [list, setList] = useLocalStorage(storageKey, defaults)
+  const [list, setList] = useERPCollection(storageKey)
   const [filter, setFilter] = useState('active')
   const [search, setSearch] = useState('')
   const [editing, setEditing] = useState(null) // { mode: 'add' | 'edit', record? }

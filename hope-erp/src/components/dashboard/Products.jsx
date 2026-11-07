@@ -1,6 +1,6 @@
 import { useState } from 'react'
-import { useLocalStorage } from '../../hooks/useLocalStorage'
-import { KEYS, DEFAULT_PRODUCTS, DEFAULT_PRICES } from '../../data/defaults'
+import { useERPCollection } from '../../hooks/useERPData'
+import { KEYS } from '../../data/defaults'
 import RecordManager from '../ui/RecordManager'
 import ActionButton from '../ui/ActionButton'
 import Modal from '../ui/Modal'
@@ -18,8 +18,8 @@ const priceFields = [
 ]
 
 export default function Products() {
-  const [products, setProducts] = useLocalStorage(KEYS.products, DEFAULT_PRODUCTS)
-  const [prices, setPrices] = useLocalStorage(KEYS.prices, DEFAULT_PRICES)
+  const [products, setProducts] = useERPCollection(KEYS.products)
+  const [prices, setPrices] = useERPCollection(KEYS.prices)
   const [priceFor, setPriceFor] = useState(null) // product whose price history is open
 
   return (

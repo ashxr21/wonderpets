@@ -13,33 +13,40 @@ function LoginForm({ onClose, onSwitch }) {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [showPw, setShowPw] = useState(false)
-  const [remember, setRemember] = useState(false)
   const [error, setError] = useState('')
+  const [busy, setBusy] = useState(false)
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
-    const res = login(email.trim(), password)
-    if (!res.ok) return setError(res.error)
-    onClose()
+    setError('')
+    setBusy(true)
+    try {
+      const res = await login(email.trim(), password)
+      if (!res.ok) return setError(res.error)
+      onClose()
+    } catch (submitError) {
+      setError(submitError.message)
+    } finally {
+      setBusy(false)
+    }
   }
 
-  const handleGoogle = () => {
-    loginWithGoogle()
-    onClose()
+  const handleGoogle = async () => {
+    setError('')
+    try {
+      const res = await loginWithGoogle()
+      if (!res.ok) setError(res.error)
+    } catch (loginError) {
+      setError(loginError.message)
+    }
   }
 
   return (
     <>
-      <div className="mb-4 rounded-[14px] border border-dashed border-[#5b86f0]/50 bg-white/55 px-3.5 py-3 text-[.8rem] text-[#4468d8]">
-        <strong className="mb-1 block">Demo accounts (any password works):</strong>
-        superadmin@hope.com → Superadmin<br />
-        admin@hope.com → Admin<br />
-        user@hope.com → Regular User
-      </div>
       <Alert message={error} />
       <form onSubmit={handleSubmit}>
         <FormField label="Email address" htmlFor="loginEmail">
-          <input id="loginEmail" type="email" required className={inputCls} placeholder="you@company.com"
+          <input id="loginEmail" type="email" required className={inputCls} placeholder="Email Address"
             value={email} onChange={(e) => setEmail(e.target.value)} />
         </FormField>
         <FormField label="Password" htmlFor="loginPassword">
@@ -52,15 +59,10 @@ function LoginForm({ onClose, onSwitch }) {
             </button>
           </div>
         </FormField>
-        <div className="mb-5 flex items-center justify-between text-[.85rem]">
-          <label className="flex cursor-pointer items-center gap-2">
-            <input type="checkbox" className="h-4 w-4 accent-[#5b86f0]" checked={remember}
-              onChange={(e) => setRemember(e.target.checked)} />
-            Remember me
-          </label>
+        <div className="mb-5 flex justify-end text-[.85rem]">
           <a className={linkCls} onClick={() => onSwitch('reset')}>Forgot password?</a>
         </div>
-        <Button type="submit" size="full">Sign In</Button>
+        <Button type="submit" size="full" disabled={busy}>{busy ? 'Signing in…' : 'Sign In'}</Button>
       </form>
 
       <div className="my-5 flex items-center gap-3 text-[.8rem] text-[#6679a3] before:h-px before:flex-1 before:bg-[rgba(120,145,210,.22)] after:h-px after:flex-1 after:bg-[rgba(120,145,210,.22)]">

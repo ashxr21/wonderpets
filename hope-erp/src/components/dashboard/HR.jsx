@@ -1,8 +1,8 @@
     import { useState } from 'react'
     import { useAuth } from '../../context/AuthContext'
-    import { useLocalStorage } from '../../hooks/useLocalStorage'
+    import { useERPCollection } from '../../hooks/useERPData'
     import {
-    KEYS, DEFAULT_EMPLOYEES, DEFAULT_JOBS, DEFAULT_DEPTS, DEFAULT_JOB_HISTORY,
+    KEYS,
     } from '../../data/defaults'
     import RecordManager from '../ui/RecordManager'
     import ActionButton from '../ui/ActionButton'
@@ -44,10 +44,10 @@
     export default function HR() {
     const { can } = useAuth()
     const [tab, setTab] = useState('employees')
-    const [employees, setEmployees] = useLocalStorage(KEYS.employees, DEFAULT_EMPLOYEES)
-    const [jobs, setJobs] = useLocalStorage(KEYS.jobs, DEFAULT_JOBS)
-    const [depts, setDepts] = useLocalStorage(KEYS.depts, DEFAULT_DEPTS)
-    const [history, setHistory] = useLocalStorage(KEYS.jobHistory, DEFAULT_JOB_HISTORY)
+    const [employees, setEmployees] = useERPCollection(KEYS.employees)
+    const [jobs, setJobs] = useERPCollection(KEYS.jobs)
+    const [depts, setDepts] = useERPCollection(KEYS.depts)
+    const [history, setHistory] = useERPCollection(KEYS.jobHistory)
     const [histFor, setHistFor] = useState(null) // employee whose job history is open
 
     const jobOptions = jobs.filter((j) => !j.isDeleted).map((j) => ({ value: j.jobCode, label: `${j.jobCode} – ${j.jobDesc}` }))

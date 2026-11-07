@@ -5,6 +5,8 @@ import DashboardLayout from './components/dashboard/DashboardLayout'
 import LoginModal from './components/auth/LoginModal'
 import RegisterModal from './components/auth/RegisterModal'
 import ResetModal from './components/auth/ResetModal'
+import UpdatePasswordModal from './components/auth/UpdatePasswordModal'
+import { useERPData } from './hooks/useERPData'
 
 // Fixed gradient backdrop + two decorative orbs (replaces body background / ::before / ::after)
 function Background() {
@@ -20,8 +22,9 @@ function Background() {
     }
 
     export default function App() {
-    const { currentUser } = useAuth()
-    const [modal, setModal] = useState(null) // null | 'login' | 'register' | 'reset'
+        const { currentUser, authReady, authError, passwordRecovery, setPasswordRecovery } = useAuth()
+        const { loading: dataLoading, error: dataError } = useERPData()
+        const [modal, setModal] = useState(null) // null | 'login' | 'register' | 'reset'
 
     // Close any open auth modal once the user is signed in
     useEffect(() => {
@@ -30,12 +33,24 @@ function Background() {
 
     const close = () => setModal(null)
 
+    if (!authReady) {
+        return <div className="p-8 text-center text-[#6679a3]">Connecting to Supabase…</div>
+    }
+
     return (
         <div className="min-h-screen font-sans leading-[1.55] text-[#1d2a4d]">
         <Background />
 
+        {(authError || dataError) && (
+            <div role="alert" className="mx-4 mt-4 rounded-xl border border-red-300 bg-red-50 px-4 py-3 text-sm text-red-800">
+                {authError || dataError}
+            </div>
+        )}
+
         {currentUser ? (
-            <DashboardLayout />
+            dataLoading
+                ? <div className="p-8 text-center text-[#6679a3]">Loading your ERP data…</div>
+                : <DashboardLayout />
         ) : (
             <>
             <LandingPage onOpen={setModal} />
@@ -47,6 +62,7 @@ function Background() {
             <ResetModal open={modal === 'reset'} onClose={close} onSwitch={setModal} />
             </>
         )}
-        </div>
-    )
+            <UpdatePasswordModal open={passwordRecovery} onClose={() => setPasswordRecovery(false)} />
+            </div>
+        )
     }

@@ -1,29 +1,27 @@
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 import { useAuth } from '../../context/AuthContext'
-import { useLocalStorage } from '../../hooks/useLocalStorage'
-import { readStore } from '../../utils/storage'
+import { useERPCollection, useERPData } from '../../hooks/useERPData'
 import { computeSales, money, priceFor } from '../../utils/pricing'
 import {
-    KEYS, DEFAULT_SALES, DEFAULT_SALES_DETAIL, DEFAULT_CUSTOMERS,
-    DEFAULT_PRODUCTS, DEFAULT_PRICES, DEFAULT_EMPLOYEES,
+KEYS,
     } from '../../data/defaults'
     import RecordManager from '../ui/RecordManager'
     import ActionButton from '../ui/ActionButton'
     import Modal from '../ui/Modal'
+    import { DataTable, Td, Badge } from '../ui/DataTable'
 
     export default function Sales() {
     const { can } = useAuth()
-    const [sales, setSales] = useLocalStorage(KEYS.sales, DEFAULT_SALES)
-    const [details, setDetails] = useLocalStorage(KEYS.salesDetail, DEFAULT_SALES_DETAIL)
+    const [sales, setSales] = useERPCollection(KEYS.sales)
+    const [details, setDetails] = useERPCollection(KEYS.salesDetail)
     const [detailsFor, setDetailsFor] = useState(null) // transNo
-
-    // Data owned by other modules (read once when this screen opens)
-    const { customers, employees, products, prices } = useMemo(() => ({
-        customers: readStore(KEYS.customers, DEFAULT_CUSTOMERS),
-        employees: readStore(KEYS.employees, DEFAULT_EMPLOYEES),
-        products: readStore(KEYS.products, DEFAULT_PRODUCTS),
-        prices: readStore(KEYS.prices, DEFAULT_PRICES),
-    }), [])
+    const [paymentsFor, setPaymentsFor] = useState(null) // transNo
+    const { collections } = useERPData()
+    const customers = collections[KEYS.customers]
+    const employees = collections[KEYS.employees]
+    const products = collections[KEYS.products]
+    const prices = collections[KEYS.prices]
+    const payments = collections[KEYS.payments]
 
     const customerOptions = customers.filter((c) => !c.isDeleted).map((c) => ({ value: c.custNo, label: `${c.custNo} – ${c.custName}` }))
     const employeeOptions = employees.filter((e) => !e.isDeleted).map((e) => ({ value: e.empNo, label: `${e.empNo} – ${e.firstName} ${e.lastName}` }))
@@ -40,6 +38,10 @@ import {
     ]
 
     const sale = sales.find((s) => s.transNo === detailsFor)
+    const paymentSale = sales.find((s) => s.transNo === paymentsFor)
+    const salePayments = payments
+        .filter((payment) => payment.transNo === paymentsFor)
+        .sort((a, b) => b.payDate.localeCompare(a.payDate))
 
     const detailFields = sale && [
         { name: 'transNo', label: 'Transaction No.', hideInTable: true },
@@ -73,7 +75,12 @@ import {
             perms={{ add: 'sales.add', edit: 'sales.edit', delete: 'sales.delete' }}
             sort={(a, b) => b.salesDate.localeCompare(a.salesDate)}
             extraActions={(r) =>
-            can('sales.detailView') && <ActionButton onClick={() => setDetailsFor(r.transNo)}>Details</ActionButton>
+            can('sales.detailView') && (
+                <>
+                    <ActionButton onClick={() => setDetailsFor(r.transNo)}>Details</ActionButton>
+                    <ActionButton onClick={() => setPaymentsFor(r.transNo)}>Payments</ActionButton>
+                </>
+            )
             }
         />
 
@@ -98,6 +105,27 @@ import {
                 </div>
             </>
             )}
+        </Modal>
+
+        <Modal
+            open={!!paymentSale} onClose={() => setPaymentsFor(null)} size="xl"
+            title={paymentSale ? `Payments – ${paymentSale.transNo}` : ''}
+            subtitle={paymentSale ? `${paymentSale.salesDate} · ${customerOptions.find((c) => c.value === paymentSale.custNo)?.label ?? paymentSale.custNo}` : ''}
+        >
+            <DataTable heads={['OR No.', 'Payment Date', 'Amount', 'Status', 'Stamp']}>
+                {salePayments.length === 0 && (
+                    <tr><td colSpan={5} className="px-5 py-14 text-center text-[#6679a3]">No payments found for this sale.</td></tr>
+                )}
+                {salePayments.map((payment) => (
+                    <tr key={payment.orNo} className={payment.isDeleted ? 'bg-[rgba(229,72,77,.08)] opacity-85' : ''}>
+                        <Td><strong>{payment.orNo}</strong></Td>
+                        <Td>{payment.payDate}</Td>
+                        <Td>{money(payment.amount)}</Td>
+                        <Td><Badge deleted={payment.isDeleted} /></Td>
+                        <Td className="max-w-[200px] text-[.72rem] text-[#6679a3]">{payment.stamp}</Td>
+                    </tr>
+                ))}
+            </DataTable>
         </Modal>
         </>
     )

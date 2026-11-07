@@ -133,10 +133,11 @@ const ROLE_STYLE = {
     }
 
     export default function UserManagement() {
-    const { users, setUsers, currentUser } = useAuth()
+    const { users, currentUser, updateUser } = useAuth()
     const [filter, setFilter] = useState('all')
     const [editing, setEditing] = useState(null) // { mode, user? }
     const [rightsFor, setRightsFor] = useState(null)
+    const [error, setError] = useState('')
 
     const me = currentUser.email.toLowerCase()
     const isSelf = (u) => u.email.toLowerCase() === me
@@ -144,18 +145,19 @@ const ROLE_STYLE = {
     const manageable = (u) => !isSelf(u) && (currentUser.role === 'superadmin' || u.role === 'user')
     const roles = currentUser.role === 'superadmin' ? ['user', 'admin', 'superadmin'] : ['user']
 
-    const patch = (email, changes) =>
-        setUsers((prev) => prev.map((u) => (u.email.toLowerCase() === email.toLowerCase() ? { ...u, ...changes } : u)))
+    const patch = async (email, changes) => {
+        const user = users.find((item) => item.email.toLowerCase() === email.toLowerCase())
+        if (!user) return { ok: false, error: 'User profile was not found.' }
+        const result = await updateUser(user.id, changes)
+        if (!result.ok) setError(result.error)
+        return result
+    }
 
-    const saveUser = (values) => {
-        if (editing.mode === 'add') {
-        setUsers((prev) => [...prev, { ...values, perms: values.role === 'user' ? emptyPerms() : fullPerms() }])
-        } else {
+    const saveUser = async (values) => {
         const old = editing.user
         const perms = values.role === old.role ? old.perms : values.role === 'user' ? emptyPerms() : fullPerms()
-        patch(old.email, { ...values, perms })
-        }
-        setEditing(null)
+        const result = await patch(old.email, { ...values, perms })
+        if (result.ok) setEditing(null)
     }
 
     const count = (s) => users.filter((u) => u.status === s).length
@@ -163,9 +165,11 @@ const ROLE_STYLE = {
 
     return (
         <>
+        <Alert message={error} />
         <div className="mb-[18px] flex flex-wrap items-center justify-between gap-3">
             <h3 className="text-[1.3rem] font-extrabold">User Management</h3>
             <div className="flex flex-wrap items-center gap-2.5">
+            <span className="text-[.8rem] text-[#6679a3]">Users register with their own email; approve them here.</span>
             <Tabs
                 value={filter} onChange={setFilter}
                 options={[
@@ -176,7 +180,6 @@ const ROLE_STYLE = {
                 { value: 'disapproved', label: 'Disapproved' },
                 ]}
             />
-            <Button size="sm" onClick={() => setEditing({ mode: 'add' })}>+ Add User</Button>
             </div>
         </div>
 
@@ -237,7 +240,10 @@ const ROLE_STYLE = {
             {rightsFor && (
             <RightsForm
                 user={rightsFor}
-                onSave={(perms) => { patch(rightsFor.email, { perms }); setRightsFor(null) }}
+                onSave={async (perms) => {
+                    const result = await patch(rightsFor.email, { perms })
+                    if (result.ok) setRightsFor(null)
+                }}
                 onCancel={() => setRightsFor(null)}
             />
             )}
