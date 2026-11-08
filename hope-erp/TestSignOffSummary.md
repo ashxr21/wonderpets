@@ -1,6 +1,5 @@
 Five test cases were executed and fixed, and one defect remains open.
 
-Sprint 1 Tester Sign-Off Summary
 
 The Tester has completed three test cycles covering system stabilization, component navigation and Supabase integration. Rendering errors, styling failures, layout breakdowns, a runtime crash and a data-access blockade were each identified, fixed by the developers, and verified through retesting and regression checks.
 
