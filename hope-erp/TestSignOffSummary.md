@@ -5,6 +5,6 @@ The Tester has completed three test cycles covering system stabilization, compon
 
 The core framework is structurally stable and approved for release, with the following condition: BUG-001 (Sales tab access for newly registered users) remains open and is carried into Sprint 2 for resolution by Developer 2 and the DBA.
 
-Tester:    --------------------
+Tester:    Diego, Arhiana A.
 
 Status:    Approved for release, pending BUG-001
