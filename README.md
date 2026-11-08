@@ -2,23 +2,23 @@
 
 
 
-Scrum Master: Sapurna, Asher D.
+Scrum Master: SAPURNA, Asher D.
 
 
 
-
-UI Designer: Fadrilan, Merlyn Angel C.
-
+UI Designer: FADRILAN, Merlyn Angel C. 
 
 
 
-DB Admin: Aglipay, Rozzelle Anne M.
+DB Admin: AGLIPAY, Rozzelle Anne M.
 
 
 
+Dev: LARGO, Althea Loribel C.
 
-Dev: Largo, Althea Loribel C.
 
+
+Dev2: DE ASIS, Clarence L
 
 
 
