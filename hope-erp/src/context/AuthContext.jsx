@@ -215,10 +215,7 @@ export function AuthProvider({ children }) {
   }
 
   const canModule = (module) => {
-    if (module === 'sales') {
-      return ['sales.view', 'customers.view', 'products.view', 'hr.view'].every(can)
-    }
-    return can(`${module}.view`)
+      return can(`${module}.view`)
   }
   return (
     <AuthContext.Provider
