@@ -22,10 +22,5 @@ Dev2: DE ASIS, Clarence L
 
 
 
-Dev2: DE ASIS, Clarence L
-
-
-
-
 Tester: DIEGO, Arhiana A. 
 
