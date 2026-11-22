@@ -4,7 +4,7 @@
 | **Prepared by**: Scrum Master(Asher Sapurna) |
 
 
-| **Date** : November 8, 2026 |
+| **Date** : November 22, 2026 |
 
 
 | **Stack**: React, Vite, Tailwind CSS, Supabase (PostgreSQL) |
@@ -115,19 +115,25 @@ File-name typos (`storage,js`, `ReadManager.jsx`, `default.js`) caused several b
 ---
 ## 5. Current Project Status and Resolution
 
-### Resolved defect: BUG-001
+### Resolved defect: BUG-002
 
-- **Title:** Sales Tab Restricted for Newly Created User Accounts
+- **Title:** Password Reset Signs the User In Immediately
 - **Priority / Severity:** High / Major
 - **Status:** Resolved and verified
+- **Reported by:** Professor (demonstration review)
 
-**Symptom:** established profiles worked on every page, but a newly created account saw the Sales tab hidden.
+**Symptom:** after a user set a new password through the reset flow, the app signed them in immediately and opened the dashboard.
 
-**Root cause:** the `canModule` function in `src/context/AuthContext.jsx` had a special case for the Sales module. It required four permissions to all be true (`sales.view`, `customers.view`, `products.view` and `hr.view`) before showing the tab. Newly created accounts start with no module rights, so the check always failed (**Over-Restrictive Access Control Logic**).
+**Expected behavior:** after the password is reset, the user is signed out, returns to the landing page, and logs in again with the new password (**Authentication Flow, Credential Re-verification**).
 
-**Resolution:** the team removed the special case, so every module, including Sales, now uses the same rule: `return can(`${module}.view`)`. Access to Sales now depends only on the `sales.view` permission (**Consistent Authorization Logic, Principle of Least Privilege**).
+**Root cause:** Supabase creates a temporary session when the user opens the reset link, and that session stayed active after the password was updated. The `updatePassword` function in `src/context/AuthContext.jsx` never ended it, so the app treated the user as logged in (**Session Management**).
 
-**Verification:** the Tester registered a fresh account, confirmed the Sales tab appears once `sales.view` is granted, and ran a regression pass across all tabs (**Regression Testing**). Result: **Pass**.
+**Resolution:** the `updatePassword` function in `src/context/AuthContext.jsx` now ends the recovery session once the password is updated:
+- After `supabase.auth.updateUser({ password })` succeeds, it calls `supabase.auth.signOut()` to end the temporary session.
+- If sign-out fails, it returns a clear error message instead of failing silently (**Error Handling**).
+- It then clears the app's user state with `setCurrentUser(null)` and `setUsers([])`, and exits recovery mode with `setPasswordRecovery(false)`, so the user returns to the landing page and signs in again with the new password.
+
+**Verification:** the Tester confirmed that after a reset the user lands on the landing page, the old password is rejected, the new password works, and a refresh does not restore a session (**Regression Testing**). Result: **Pass**.
 
 ### Project status
 
@@ -164,4 +170,4 @@ The core framework is structurally stable and complete. The team delivered a wor
 
 **Scrum Master:** Asher Sapurna 
 
-**Date:** November 8, 2026
+**Date:** November 22, 2026
