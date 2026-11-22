@@ -2,7 +2,9 @@ import Button from '../ui/Button'
 import { glass } from '../ui/styles'
 
 export default function Navbar({ onOpen }) {
+
   return (
+    
     <nav
       className={`${glass} fixed top-4 left-1/2 z-[100] flex h-[72px] w-[min(1100px,calc(100%-28px))]
         -translate-x-1/2 items-center justify-between rounded-full border border-white/80 bg-white/30 px-5 pr-4 shadow-[0_20px_55px_-22px_rgba(101,120,200,.42)] backdrop-blur-[18px]`}
