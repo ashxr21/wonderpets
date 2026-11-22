@@ -12,12 +12,16 @@ const linkCls = 'cursor-pointer, font-semibold text-[#4468d8] hover:underline'
 function LoginForm({ onClose, onSwitch }) {
 
   const { login, loginWithGoogle } = useAuth()
+
   const [email, setEmail] = useState('')
+
   const [password, setPassword] = useState('')
+
   const [showPw, setShowPw] = useState(false)
+
   const [error, setError] = useState('')
-  const [busy, setBusy] = useState(false)
   
+  const [busy, setBusy] = useState(false)
 
   const handleSubmit = async (e) => {
     e.preventDefault()
