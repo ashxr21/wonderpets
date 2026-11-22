@@ -8,6 +8,12 @@ uses the Supabase publishable key; authorization is enforced by row-level securi
 (RLS) in Supabase.
 
 1. In the Supabase dashboard, open **SQL Editor** and run [`supabase/schema.sql`](./supabase/schema.sql).
+   The script also creates missing profiles for existing Auth users; these accounts
+   start as pending and still require administrator approval.
+   Existing projects that were set up before deletion history was added can run
+   [`supabase/deletion-logs.sql`](./supabase/deletion-logs.sql) to add the audit table
+   and its access policies. Until then, permanent deletion remains blocked and
+   the app explains how to enable it.
 2. In **Authentication → URL Configuration**, set the Site URL and add your local
    and deployed app URLs to the redirect allow list (for local development,
    `http://localhost:5173`).
