@@ -10,6 +10,7 @@ import {
     import FormField from '../ui/FormField'
     import { DataTable, Td } from '../ui/DataTable'
     import { inputCls, glass } from '../ui/styles'
+    import { Printer } from 'lucide-react'
 
     const REPORTS = [
     { id: 'topCustomers', perm: 'reports.topCustomers', label: 'Top Customers', dataPerms: ['sales.view', 'customers.view', 'products.view'] },
@@ -29,6 +30,7 @@ import {
     const available = REPORTS.filter((r) => can(r.perm) && r.dataPerms.every(can))
     const [active, setActive] = useState(available[0]?.id)
     const [histEmp, setHistEmp] = useState('all')
+    const current = available.find((r) => r.id === active) ?? available[0]
 
     const d = {
         customers: collections[KEYS.customers],
@@ -124,8 +126,11 @@ import {
         }),
     }
 
-    const current = available.find((r) => r.id === active) ?? available[0]
     const { heads, rows } = builders[current.id]()
+    const tableHeads = heads.map((label) => {
+        const numeric = /total|revenue|salary|price|amount|qty|transactions/i.test(label)
+        return numeric ? { label, align: 'right' } : label
+    })
 
     return (
         <div>
@@ -134,7 +139,7 @@ import {
         </div>
 
         <div className="mb-4 flex flex-wrap items-end justify-between gap-3 print:hidden">
-            <h3 className="text-[1.3rem] font-extrabold">{current.label}</h3>
+            <h3 className="text-lg leading-6 font-bold text-slate-900">{current.label}</h3>
             <div className="flex items-end gap-3">
             {current.id === 'empJobHistory' && (
                 <div className="w-[240px] [&>div]:mb-0">
@@ -146,7 +151,7 @@ import {
                 </FormField>
                 </div>
             )}
-            <Button size="sm" onClick={() => window.print()}>🖨 Print</Button>
+            <Button size="sm" onClick={() => window.print()}><Printer aria-hidden="true" className="mr-2 inline h-4 w-4" />Print</Button>
             </div>
         </div>
 
@@ -156,13 +161,22 @@ import {
             <p className="text-sm text-gray-600">Generated {today}</p>
         </div>
 
-        <DataTable heads={heads}>
+        <DataTable heads={tableHeads}>
             {rows.length === 0 && (
-            <tr><td colSpan={heads.length} className="px-5 py-14 text-center text-[#6679a3]">No data for this report.</td></tr>
+            <tr><td colSpan={heads.length} className="px-5 py-14 text-center text-slate-600">No data for this report.</td></tr>
             )}
             {rows.map((row, i) => (
             <tr key={i} className="group hover:bg-white/55">
-                {row.map((cell, j) => <Td key={j}>{j === 0 ? <strong>{cell}</strong> : cell}</Td>)}
+                {row.map((cell, j) => {
+                    const head = heads[j]
+                    const numeric = /total|revenue|salary|price|amount|qty|transactions/i.test(head)
+                    const date = /date|hired|effective|separated/i.test(head)
+                    return (
+                        <Td key={j} className={`${numeric ? 'text-right font-mono font-semibold tabular-nums' : ''} ${date ? 'whitespace-nowrap' : ''}`}>
+                            {j === 0 ? <strong>{cell}</strong> : cell}
+                        </Td>
+                    )
+                })}
             </tr>
             ))}
         </DataTable>

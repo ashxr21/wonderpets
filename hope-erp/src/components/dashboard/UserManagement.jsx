@@ -9,6 +9,9 @@ import Tabs from '../ui/Tabs'
 import ActionButton from '../ui/ActionButton'
 import { DataTable, Td } from '../ui/DataTable'
 import { inputCls } from '../ui/styles'
+import IconActionButton from '../ui/IconActionButton'
+import ModuleKPIs from '../ui/ModuleKPIs'
+import { Ban, Check, KeyRound, Pencil, UserRoundCheck, X } from 'lucide-react'
 
 const ROLE_STYLE = {
     superadmin: 'bg-[rgba(139,124,246,.2)] text-[#5b46d6]',
@@ -61,7 +64,7 @@ const ROLE_STYLE = {
             </FormField>
             </div>
             <FormField label="Email" htmlFor="umEmail">
-            <input id="umEmail" type="email" required disabled={mode === 'edit'} className={`${inputCls} disabled:bg-[rgba(220,230,250,.6)] disabled:text-[#6679a3]`}
+            <input id="umEmail" type="email" required disabled={mode === 'edit'} className={`${inputCls} disabled:bg-[rgba(220,230,250,.6)] disabled:text-slate-600`}
                 value={v.email} onChange={set('email')} />
             </FormField>
             <div className="grid grid-cols-2 gap-x-3.5 max-[600px]:grid-cols-1">
@@ -106,7 +109,7 @@ const ROLE_STYLE = {
                 <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
                 <label className="flex cursor-pointer items-center gap-2 font-bold">
                     <input type="checkbox" className="h-4 w-4 accent-[#5b86f0]" checked={!!perms[g.view]} onChange={() => toggleView(g)} />
-                    {g.label} <span className="text-[.75rem] font-medium text-[#6679a3]">(module access)</span>
+                    {g.label} <span className="text-[.75rem] font-medium text-slate-600">(module access)</span>
                 </label>
                 <div className="flex gap-1.5">
                     <ActionButton onClick={() => setGroup(g, true)}>Select all</ActionButton>
@@ -162,14 +165,21 @@ const ROLE_STYLE = {
 
     const count = (s) => users.filter((u) => u.status === s).length
     const visible = users.filter((u) => filter === 'all' || u.status === filter)
+    const userKpis = [
+        { label: 'Total users', value: users.length, tone: 'indigo' },
+        { label: 'Active', value: count('active'), tone: 'emerald' },
+        { label: 'Pending approval', value: count('pending'), tone: 'amber' },
+        { label: 'Blocked', value: count('blocked'), tone: 'rose' },
+    ]
 
     return (
         <>
         <Alert message={error} />
+        <ModuleKPIs items={userKpis} />
         <div className="mb-[18px] flex flex-wrap items-center justify-between gap-3">
-            <h3 className="text-[1.3rem] font-extrabold">User Management</h3>
+            <h3 className="text-lg leading-6 font-bold text-slate-900">User Management</h3>
             <div className="flex flex-wrap items-center gap-2.5">
-            <span className="text-[.8rem] text-[#6679a3]">Users register with their own email; approve them here.</span>
+            <span className="text-[.8rem] text-slate-600">Users register with their own email; approve them here.</span>
             <Tabs
                 value={filter} onChange={setFilter}
                 options={[
@@ -185,33 +195,33 @@ const ROLE_STYLE = {
 
         <DataTable heads={['Name', 'Email', 'Role', 'Status', 'Actions']}>
             {visible.length === 0 && (
-            <tr><td colSpan={5} className="px-5 py-14 text-center text-[#6679a3]">No users found.</td></tr>
+            <tr><td colSpan={5} className="px-5 py-14 text-center text-slate-600">No users found.</td></tr>
             )}
             {visible.map((u) => (
             <tr key={u.email} className="group hover:bg-white/55">
-                <Td><strong>{u.firstName} {u.lastName}</strong>{isSelf(u) && <span className="ml-2 text-[.72rem] text-[#6679a3]">(you)</span>}</Td>
+                <Td className="whitespace-nowrap"><strong>{u.firstName} {u.lastName}</strong>{isSelf(u) && <span className="ml-2 text-[.72rem] text-slate-500">(you)</span>}</Td>
                 <Td>{u.email}</Td>
                 <Td><Pill cls={ROLE_STYLE[u.role]}>{u.role}</Pill></Td>
                 <Td><Pill cls={STATUS_STYLE[u.status]}>{u.status}</Pill></Td>
-                <Td>
-                <div className="flex flex-wrap gap-1.5">
+                <Td className="whitespace-nowrap">
+                <div className="flex items-center gap-1">
                     {manageable(u) && u.status === 'pending' && (
                     <>
-                        <ActionButton tone="success" onClick={() => patch(u.email, { status: 'active', perms: u.role === 'user' ? { ...emptyPerms(), ...u.perms } : fullPerms() })}>Approve</ActionButton>
-                        <ActionButton tone="danger" onClick={() => patch(u.email, { status: 'disapproved' })}>Disapprove</ActionButton>
+                        <IconActionButton icon={Check} label={`Approve ${u.firstName} ${u.lastName}`} tone="success" onClick={() => patch(u.email, { status: 'active', perms: u.role === 'user' ? { ...emptyPerms(), ...u.perms } : fullPerms() })} />
+                        <IconActionButton icon={X} label={`Disapprove ${u.firstName} ${u.lastName}`} tone="danger" onClick={() => patch(u.email, { status: 'disapproved' })} />
                     </>
                     )}
                     {manageable(u) && u.status === 'active' && (
-                    <ActionButton tone="danger" onClick={() => patch(u.email, { status: 'blocked' })}>Block</ActionButton>
+                    <IconActionButton icon={Ban} label={`Block ${u.firstName} ${u.lastName}`} tone="danger" onClick={() => patch(u.email, { status: 'blocked' })} />
                     )}
                     {manageable(u) && (u.status === 'blocked' || u.status === 'disapproved') && (
-                    <ActionButton tone="success" onClick={() => patch(u.email, { status: 'active' })}>Activate</ActionButton>
+                    <IconActionButton icon={UserRoundCheck} label={`Activate ${u.firstName} ${u.lastName}`} tone="success" onClick={() => patch(u.email, { status: 'active' })} />
                     )}
                     {manageable(u) && u.role === 'user' && (
-                    <ActionButton onClick={() => setRightsFor(u)}>Rights</ActionButton>
+                    <IconActionButton icon={KeyRound} label={`Manage rights for ${u.firstName} ${u.lastName}`} onClick={() => setRightsFor(u)} />
                     )}
                     {(manageable(u) || isSelf(u)) && (
-                    <ActionButton onClick={() => setEditing({ mode: 'edit', user: u })}>Edit</ActionButton>
+                    <IconActionButton icon={Pencil} label={`Edit ${u.firstName} ${u.lastName}`} onClick={() => setEditing({ mode: 'edit', user: u })} />
                     )}
                 </div>
                 </Td>

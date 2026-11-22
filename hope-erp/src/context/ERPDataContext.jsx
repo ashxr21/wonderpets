@@ -3,6 +3,7 @@ import { useAuth } from './AuthContext'
 import { ERPDataContext } from './erpData'
 import { KEYS } from '../data/defaults'
 import { supabase } from '../lib/supabase'
+import { computeSales, money } from '../utils/pricing'
 
 const collections = [
   { storageKey: KEYS.customers, name: 'customers', keyOf: (r) => r.custNo },
@@ -18,6 +19,17 @@ const collections = [
 ]
 
 const emptyData = () => Object.fromEntries(collections.map(({ storageKey }) => [storageKey, []]))
+
+function deletionErrorMessage(error) {
+  if (error.code === '23503' || /foreign key/i.test(error.message)) {
+    return 'This record is still referenced by related records. Remove those references first, then try again.'
+  }
+  if (error.code === '42501' || /row-level security|permission/i.test(error.message)) {
+    return 'Supabase denied this deletion. Confirm the DELETE policy is installed and your account has delete permission.'
+  }
+  return `Could not permanently delete this record: ${error.message}`
+}
+
 function readLocalRecords(storageKey) {
   const raw = window.localStorage.getItem(storageKey)
   if (!raw) return []
@@ -25,6 +37,74 @@ function readLocalRecords(storageKey) {
   const records = JSON.parse(raw)
   if (!Array.isArray(records)) throw new Error(`Local data for ${storageKey} is not a record list.`)
   return records
+}
+
+function deletionDetails(collectionName, record, data) {
+  const recordId = String(record[{
+    customers: 'custNo',
+    products: 'prodCode',
+    prices: 'prodCode',
+    employees: 'empNo',
+    jobs: 'jobCode',
+    departments: 'deptCode',
+    job_history: 'empNo',
+    sales: 'transNo',
+    sales_details: 'transNo',
+    payments: 'orNo',
+  }[collectionName]] ?? '')
+
+  const customerName = (customerNumber) =>
+    data[KEYS.customers].find((customer) => customer.custNo === customerNumber)?.custName ?? customerNumber
+  const productDescription = (productCode) =>
+    data[KEYS.products].find((product) => product.prodCode === productCode)?.description ?? productCode
+  const employeeName = (employeeNumber) => {
+    const employee = data[KEYS.employees].find((item) => item.empNo === employeeNumber)
+    return employee ? `${employee.firstName} ${employee.lastName}`.trim() : employeeNumber
+  }
+
+  switch (collectionName) {
+    case 'customers':
+      return { module: 'Customers', recordId, summary: record.custName || recordId }
+    case 'products':
+      return { module: 'Products', recordId, summary: record.description || recordId }
+    case 'prices':
+      return { module: 'Products', recordId: `${record.prodCode}|${record.effDate}`, summary: `Price for ${productDescription(record.prodCode)} effective ${record.effDate}` }
+    case 'employees':
+      return { module: 'Employees', recordId, summary: employeeName(record.empNo) }
+    case 'jobs':
+      return { module: 'Jobs', recordId, summary: record.jobDesc || recordId }
+    case 'departments':
+      return { module: 'Departments', recordId, summary: record.deptName || recordId }
+    case 'job_history':
+      return { module: 'Employees', recordId: `${record.empNo}|${record.jobCode}|${record.effDate}`, summary: `${employeeName(record.empNo)} — ${record.jobCode}, ${record.effDate}` }
+    case 'sales': {
+      const customer = customerName(record.custNo)
+      const sale = computeSales(
+        [{ ...record, isDeleted: false }],
+        data[KEYS.salesDetail],
+        data[KEYS.prices]
+      )[0]
+      return {
+        module: 'Sales',
+        recordId,
+        summary: `Transaction for ${customer}${sale ? ` · ${money(sale.total)}` : ''}`,
+      }
+    }
+    case 'sales_details':
+      return {
+        module: 'Sales',
+        recordId: `${record.transNo}|${record.prodCode}`,
+        summary: `${productDescription(record.prodCode)} on transaction ${record.transNo}`,
+      }
+    case 'payments':
+      return {
+        module: 'Sales',
+        recordId,
+        summary: `Payment for transaction ${record.transNo}`,
+      }
+    default:
+      throw new Error(`Permanent deletion is not supported for collection: ${collectionName}`)
+  }
 }
 
 export function ERPDataProvider({ children }) {
@@ -169,6 +249,99 @@ export function ERPDataProvider({ children }) {
       })
   }, [])
 
-  const value = { collections: data, loading, error, setRecords, refresh }
+  const deleteRecord = useCallback(async (storageKey, record) => {
+    const collection = collections.find((item) => item.storageKey === storageKey)
+    if (!collection) throw new Error(`Unknown ERP collection: ${storageKey}`)
+
+    const recordKey = String(collection.keyOf(record))
+    const previousQueue = writeQueues.current[collection.name] ?? Promise.resolve()
+    let auditWarning = ''
+    const removal = previousQueue.then(async () => {
+      const { data: recordRow, error: lookupError } = await supabase
+        .from('erp_records')
+        .select('id')
+        .eq('collection', collection.name)
+        .eq('record_key', recordKey)
+        .maybeSingle()
+
+      if (lookupError) throw new Error(deletionErrorMessage(lookupError))
+      if (!recordRow) {
+        throw new Error('Supabase could not find this record. It may already have been deleted, or your account may not have access to it.')
+      }
+
+      if (!currentUser) throw new Error('You must be signed in to permanently delete a record.')
+      const { module, recordId, summary } = deletionDetails(collection.name, record, dataRef.current)
+      const deletedBy = currentUser.email || currentUser.name
+      const { data: logRow, error: logError } = await supabase
+        .from('deletion_logs')
+        .insert({
+          module,
+          record_id: recordId,
+          record_summary: summary,
+          deleted_data: record,
+          deleted_by: deletedBy,
+          pending: true,
+        })
+        .select('id')
+        .single()
+
+      if (logError) {
+        throw new Error(`Could not save the deletion history; the record was not deleted: ${logError.message}`)
+      }
+      if (!logRow) throw new Error('Could not confirm the deletion history was saved; the record was not deleted.')
+
+      try {
+        const { data: deletedRows, error: deleteError } = await supabase
+          .from('erp_records')
+          .delete()
+          .eq('id', recordRow.id)
+          .select('id')
+
+        if (deleteError) throw new Error(deletionErrorMessage(deleteError))
+        if (!deletedRows?.length) {
+          throw new Error('Supabase did not delete this record. It may already be gone, or your account may not have DELETE permission.')
+        }
+      } catch (deleteFailure) {
+        const { data: rolledBackRows, error: rollbackError } = await supabase
+          .from('deletion_logs')
+          .delete()
+          .eq('id', logRow.id)
+          .eq('pending', true)
+          .select('id')
+
+        if (rollbackError || !rolledBackRows?.length) {
+          const reason = rollbackError?.message ?? 'Supabase did not remove the audit row.'
+          throw new Error(`${deleteFailure.message} The failed deletion log could not be rolled back: ${reason}`)
+        }
+        throw deleteFailure
+      }
+
+      const { data: completedRows, error: completionError } = await supabase
+        .from('deletion_logs')
+        .update({ pending: false })
+        .eq('id', logRow.id)
+        .eq('pending', true)
+        .select('id')
+
+      if (completionError || !completedRows?.length) {
+        auditWarning = `The record was deleted, but its audit log could not be finalized: ${completionError?.message ?? 'Supabase did not update the audit row.'}`
+      }
+    })
+
+    writeQueues.current[collection.name] = removal.then(() => undefined, () => undefined)
+    await removal
+
+    const next = {
+      ...dataRef.current,
+      [storageKey]: dataRef.current[storageKey].filter(
+        (item) => String(collection.keyOf(item)) !== recordKey
+      ),
+    }
+    dataRef.current = next
+    setData(next)
+    return auditWarning ? { warning: auditWarning } : null
+  }, [currentUser])
+
+  const value = { collections: data, loading, error, setRecords, deleteRecord, refresh }
   return <ERPDataContext.Provider value={value}>{children}</ERPDataContext.Provider>
 }
