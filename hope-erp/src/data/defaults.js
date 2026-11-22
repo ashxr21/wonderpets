@@ -17,6 +17,7 @@ export const KEYS = {
   sales: 'hope_erp_sales_v1',
   
   salesDetail: 'hope_erp_salesdetail_v1',
+  payments: 'hope_erp_payments_v1',
 }
 
 const rec = (o) => ({ ...o, isDeleted: false, stamp: 'CREATED system 2026-10-01' })

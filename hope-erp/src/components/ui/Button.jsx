@@ -22,5 +22,5 @@ const sizes = {
 }
 
 export default function Button({ variant = 'primary', size = 'md', className = '', ...props }) {
-    return <button className={'${base} ${variants[variant]} ${sizes[size]} $className}'} {...props} />
+    return <button className={`${base} ${variants[variant]} ${sizes[size]} ${className}`} {...props} />
 }

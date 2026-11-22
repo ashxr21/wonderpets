@@ -13,13 +13,13 @@ export function priceFor(prices, prodCode, date){
 export function computeSales(sales, details, prices){
     return sales
     .filter((s) => !s.isDeleted)
-    .map((d) => {
-        const lines = details.filter((d) => !d.isDeleted && d.transNo === s.transNo)
-        .map((d) => {
-            const unitPrice = priceFor(prices, d.prodCode, s.salesDate) ?? 0
-            const qty = Number(d.qty)
-            return { prodCode: d.prodCode, wty, unitPrice, amount: unitPrice * qty }
+    .map((sale) => {
+        const lines = details.filter((line) => !line.isDeleted && line.transNo === sale.transNo)
+        .map((line) => {
+            const unitPrice = priceFor(prices, line.prodCode, sale.salesDate) ?? 0
+            const qty = Number(line.qty)
+            return { prodCode: line.prodCode, qty, unitPrice, amount: unitPrice * qty }
         })
-        return { ...s, lines, total: lines.reduce((t, l) => t + l.amount, 0) }
+        return { ...sale, lines, total: lines.reduce((t, l) => t + l.amount, 0) }
     })
 }

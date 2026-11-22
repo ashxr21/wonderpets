@@ -1,11 +1,15 @@
 export const glass = 
-  'bg-white/50 border border-white/75 backdrop-blur-[22 px] backdrop-saturate-[1.6] ' +
-  'shadow-[0_18px_50px_-18px_rgba(70,100,200,.35),inset_0_1px_0_rgba(255,255,255,.9)]'
+  'bg-white/65 border border-white/50 backdrop-blur-[24px] backdrop-saturate-[1.7] ' +
+  'shadow-[0_20px_50px_-20px_rgba(70,95,190,0.18),inset_0_1px_0_0_rgba(255,255,255,0.7)]'
 
-export const grading = 'bg-linear-to-br from-[#6a93f5] to-[#8b8cf7]'
+export const glassCard =
+  'bg-white/70 border border-white/50 backdrop-blur-[18px] backdrop-saturate-[1.6] ' +
+  'shadow-[0_12px_36px_-12px_rgba(70,95,190,0.14),inset_0_1px_0_0_rgba(255,255,255,0.7)]'
+
+export const gradBg = 'bg-linear-to-br from-[#5b86f0] to-[#8678f9]'
 
 export const inputCls = 
-  'w-full rounded-[14 px] border border-[rgba(120,145,210,.3)] bg-white/65 px-3.5 py-3 ' +
-  'text-[.95rem] font-medium text-[#1d2a4d] transition placeholder:text-[#6679a3]/60 ' +
+  'w-full rounded-[14px] border border-slate-200/90 bg-white/75 px-3.5 py-2.5 ' +
+  'text-[.92rem] font-medium text-slate-900 transition placeholder:text-slate-400 ' +
   'focus:outline-none focus:bg-white focus:border-[#5b86f0] focus:ring-4 focus:ring-[#5b86f0]/20 ' +
-  'read-only:bg-[rgba(220,230,250,.6)] read-only:text-[#6679a3]'
+  'read-only:bg-slate-100/70 read-only:text-slate-500'
