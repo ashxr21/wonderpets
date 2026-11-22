@@ -1,12 +1,21 @@
 export const KEYS = {
+  
   customers: 'hope_erp_customers_v3',
+  
   products: 'hope_erp_products_v2',
+  
   prices: 'hope_erp_prices_v1',
+  
   employees: 'hope_erp_employees_v1',
+  
   jobs: 'hope_erp_jobs_v1',
+  
   depts: 'hope_erp_depts_v1',
+  
   jobHistory: 'hope_erp_jobhistory_v1',
+  
   sales: 'hope_erp_sales_v1',
+  
   salesDetail: 'hope_erp_salesdetail_v1',
 }
 
@@ -14,13 +23,18 @@ const rec = (o) => ({ ...o, isDeleted: false, stamp: 'CREATED system 2026-10-01'
 
 export const DEFAULT_CUSTOMERS = [
   { custNo: 'C-001', custName: 'Acme Corporation', address: '123 Main St, Metro City', payterms: 'Net 30' },
+  
   { custNo: 'C-002', custName: 'Globex Industries', address: '456 Oak Ave, Harbor Town', payterms: 'Net 45' },
+  
   { custNo: 'C-003', custName: 'Initech Solutions', address: '789 Pine Rd, Lakeside', payterms: 'COD' },
 ].map(rec)
 
 export const DEFAULT_PRODUCTS = [
+ 
   { prodCode: 'P-001', description: 'Industrial Widget A', unit: 'pcs' },
+ 
   { prodCode: 'P-002', description: 'Precision Gear Set', unit: 'box' },
+ 
   { prodCode: 'P-003', description: 'Heavy-Duty Bearing', unit: 'pcs' },
 ].map(rec)
 

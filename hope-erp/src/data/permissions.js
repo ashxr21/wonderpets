@@ -44,9 +44,13 @@ export const ALL_PERMS = {
 
 export const PERM_GROUPS = [
   { key: 'customers', label: 'Customer Management', view: 'customers.view', items: ['customers.add', 'customers.edit', 'customers.delete'] },
+  
   { key: 'products', label: 'Product Management', view: 'products.view', items: ['products.add', 'products.edit', 'products.delete', 'products.priceAdd', 'products.priceEdit', 'products.priceDelete'] },
+  
   { key: 'hr', label: 'Human Resources', view: 'hr.view', items: ['hr.jobAdd', 'hr.jobEdit', 'hr.jobDelete', 'hr.deptAdd', 'hr.deptEdit', 'hr.deptDelete', 'hr.empAdd', 'hr.empEdit', 'hr.empDelete', 'hr.jhView', 'hr.jhAdd', 'hr.jhEdit', 'hr.jhDelete'] },
+  
   { key: 'sales', label: 'Sales', view: 'sales.view', items: ['sales.add', 'sales.edit', 'sales.delete', 'sales.detailView', 'sales.detailAdd', 'sales.detailEdit', 'sales.detailDelete'] },
+  
   { key: 'reports', label: 'Reports', view: 'reports.view', items: ['reports.topCustomers', 'reports.productMaster', 'reports.topProducts', 'reports.activeEmployees', 'reports.allEmployees', 'reports.empJobHistory', 'reports.topSales'] },
 ]
 
@@ -69,7 +73,10 @@ export const sampleUserPerms = () => {
 
 export const DEFAULT_USERS = [
   { email: 'superadmin@hope.com', firstName: 'Sarah', lastName: 'Chen', role: 'superadmin', status: 'active', perms: fullPerms() },
+  
   { email: 'ceo@hope.com', firstName: 'Michael', lastName: 'Reyes', role: 'superadmin', status: 'active', perms: fullPerms() },
+  
   { email: 'admin@hope.com', firstName: 'Lisa', lastName: 'Park', role: 'admin', status: 'active', perms: fullPerms() },
+  
   { email: 'user@hope.com', firstName: 'Alex', lastName: 'Rivera', role: 'user', status: 'active', perms: sampleUserPerms() },
 ]
