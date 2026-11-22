@@ -3,11 +3,15 @@ import { ERPDataContext } from '../context/erpData'
 
 export function useERPData() {
 
+
   const value = useContext(ERPDataContext)
 
+  
   if (!value) throw new Error('useERPData must be used inside ERPDataProvider.')
 
+
   return value
+
 
 }
 
