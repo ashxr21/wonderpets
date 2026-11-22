@@ -7,17 +7,27 @@ import { inputCls } from '../ui/styles'
 import { useAuth } from '../../context/AuthContext'
 
 function ResetForm({ onSwitch }) {
+
   const { requestPasswordReset } = useAuth()
+
   const [email, setEmail] = useState('')
+
   const [success, setSuccess] = useState('')
+
   const [error, setError] = useState('')
+
   const [busy, setBusy] = useState(false)
 
   const handleSubmit = async (e) => {
+
     e.preventDefault()
+
     setSuccess('')
+
     setError('')
+
     setBusy(true)
+    
     try {
       const result = await requestPasswordReset(email.trim())
       if (!result.ok) {
