@@ -6,6 +6,7 @@ export default function IconActionButton({ icon: Icon, label, tone = 'neutral', 
   }
 
   return (
+
     <button
       type="button"
       aria-label={label}
@@ -16,6 +17,7 @@ export default function IconActionButton({ icon: Icon, label, tone = 'neutral', 
       {...props}
     >
       <Icon aria-hidden="true" className="h-4 w-4" strokeWidth={1.8} />
+      
     </button>
   )
 }
