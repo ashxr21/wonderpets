@@ -4,7 +4,7 @@
 | **Prepared by**: Scrum Master(Asher Sapurna) |
 
 
-| **Date** : November 8, 2026 |
+| **Date** : November 22, 2026 |
 
 
 | **Stack**: React, Vite, Tailwind CSS, Supabase (PostgreSQL) |
@@ -170,4 +170,4 @@ The core framework is structurally stable and complete. The team delivered a wor
 
 **Scrum Master:** Asher Sapurna 
 
-**Date:** November 8, 2026
+**Date:** November 22, 2026
