@@ -30,6 +30,12 @@ function deletionErrorMessage(error) {
   return `Could not permanently delete this record: ${error.message}`
 }
 
+function isMissingDeletionLogsTable(error) {
+  return error.code === '42P01'
+    || error.code === 'PGRST205'
+    || (error.message?.includes('deletion_logs') && /does not exist|not found|schema cache/i.test(error.message))
+}
+
 function readLocalRecords(storageKey) {
   const raw = window.localStorage.getItem(storageKey)
   if (!raw) return []
@@ -286,6 +292,9 @@ export function ERPDataProvider({ children }) {
         .single()
 
       if (logError) {
+        if (isMissingDeletionLogsTable(logError)) {
+          throw new Error('Permanent deletion is unavailable because the deletion_logs table is missing. Run supabase/deletion-logs.sql in your Supabase project; no record was deleted.')
+        }
         throw new Error(`Could not save the deletion history; the record was not deleted: ${logError.message}`)
       }
       if (!logRow) throw new Error('Could not confirm the deletion history was saved; the record was not deleted.')

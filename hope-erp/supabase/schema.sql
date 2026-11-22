@@ -77,6 +77,22 @@ create trigger on_auth_user_created_erp_profile
   after insert on auth.users
   for each row execute function public.create_erp_profile();
 
+insert into public.profiles (id, email, first_name, last_name)
+select
+  u.id,
+  u.email,
+  coalesce(u.raw_user_meta_data ->> 'first_name', ''),
+  coalesce(u.raw_user_meta_data ->> 'last_name', '')
+from auth.users u
+where u.email is not null
+  and u.email <> ''
+  and not exists (
+    select 1
+    from public.profiles p
+    where p.email = u.email
+  )
+on conflict (id) do nothing;
+
 create or replace function public.is_active_erp_admin()
 returns boolean
 language sql

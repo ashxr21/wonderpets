@@ -8,6 +8,7 @@ import { inputCls } from '../ui/styles'
 function ResetForm({ onSwitch }) 
   {
   const [email, setEmail] = useState('')
+
   const [success, setSuccess] = useState('')
 
   const handleSubmit = (e) => {
