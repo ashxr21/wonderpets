@@ -39,22 +39,35 @@ export const DEFAULT_PRODUCTS = [
 ].map(rec)
 
 export const DEFAULT_PRICES = [
+
   { prodCode: 'P-001', effDate: '2026-01-01', unitPrice: 25 },
+
   { prodCode: 'P-001', effDate: '2026-09-01', unitPrice: 27.5 },
+
   { prodCode: 'P-002', effDate: '2026-01-01', unitPrice: 40 },
+
   { prodCode: 'P-003', effDate: '2026-01-01', unitPrice: 120 },
+
 ].map(rec)
 
 export const DEFAULT_EMPLOYEES = [
+ 
   { empNo: 'E-001', gender: 'F', firstName: 'Maria', lastName: 'Santos', birthDate: '1990-04-12', hireDate: '2022-03-01', sepDate: '' },
+ 
   { empNo: 'E-002', gender: 'M', firstName: 'John', lastName: 'Cruz', birthDate: '1988-09-23', hireDate: '2021-06-15', sepDate: '' },
+ 
   { empNo: 'E-003', gender: 'F', firstName: 'Ana', lastName: 'Reyes', birthDate: '1995-01-30', hireDate: '2023-02-10', sepDate: '2026-08-31' },
+
 ].map(rec)
 
 export const DEFAULT_JOBS = [
+ 
   { jobCode: 'J-001', jobDesc: 'Sales Associate' },
+ 
   { jobCode: 'J-002', jobDesc: 'Sales Manager' },
+ 
   { jobCode: 'J-003', jobDesc: 'HR Officer' },
+
 ].map(rec)
 
 export const DEFAULT_DEPTS = [
