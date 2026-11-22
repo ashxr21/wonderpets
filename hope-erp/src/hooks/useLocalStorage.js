@@ -9,6 +9,7 @@ export function useLocalStorage(key, initialValue) {
       return stored ? JSON.parse(stored) : initialValue
     } catch {
       return initialValue
+
     }
   })
 

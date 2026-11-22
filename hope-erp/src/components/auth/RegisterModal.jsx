@@ -7,12 +7,16 @@ import { inputCls } from '../ui/styles'
 import { useAuth } from '../../context/AuthContext'
 
 function RegisterForm({ onSwitch }) {
-  
   const { register } = useAuth()
+
   const empty = { firstName: '', lastName: '', email: '', password: '' }
+
   const [form, setForm] = useState(empty)
+
   const [error, setError] = useState('')
+
   const [success, setSuccess] = useState('')
+  
   const [busy, setBusy] = useState(false)
 
   const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }))
@@ -40,7 +44,7 @@ function RegisterForm({ onSwitch }) {
     <>
       <Alert message={error} />
       <Alert type="success" message={success} />
-      <div className="mb-4 rounded-[14px] bg-white/55 px-3 py-2.5 text-[.8rem] text-[#6679a3]">
+      <div className="mb-4 rounded-[14px] bg-white/55 px-3 py-2.5 text-[.8rem] text-slate-600">
         New accounts require email verification and administrator approval.
       </div>
       <form onSubmit={handleSubmit}>
@@ -61,7 +65,7 @@ function RegisterForm({ onSwitch }) {
         </FormField>
         <Button type="submit" size="full" disabled={busy}>{busy ? 'Creating account…' : 'Register'}</Button>
       </form>
-      <div className="mt-5 text-center text-[.9rem] text-[#6679a3]">
+      <div className="mt-5 text-center text-[.9rem] text-slate-600">
         Already have an account?{' '}
         <a className="cursor-pointer font-semibold text-[#4468d8] hover:underline" onClick={() => onSwitch('login')}>Sign in</a>
       </div>

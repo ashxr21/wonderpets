@@ -5,17 +5,22 @@ import Alert from '../ui/Alert'
 import FormField from '../ui/FormField'
 import { inputCls } from '../ui/styles'
 import { useAuth } from '../../context/AuthContext'
+import { Eye, EyeOff } from 'lucide-react'
 
-const linkCls = 'cursor-pointer font-semibold text-[#4468d8] hover:underline'
+const linkCls = 'cursor-pointer, font-semibold text-[#4468d8] hover:underline'
 
-function LoginForm({ onClose, onSwitch }) 
- {
+function LoginForm({ onClose, onSwitch }) {
 
   const { login, loginWithGoogle } = useAuth()
+
   const [email, setEmail] = useState('')
+
   const [password, setPassword] = useState('')
+
   const [showPw, setShowPw] = useState(false)
+
   const [error, setError] = useState('')
+  
   const [busy, setBusy] = useState(false)
 
   const handleSubmit = async (e) => 
@@ -84,9 +89,9 @@ function LoginForm({ onClose, onSwitch })
           <div className="relative">
             <input id="loginPassword" type={showPw ? 'text' : 'password'} required className={`${inputCls} pr-[46px]`}
               placeholder="Enter your password" value={password} onChange={(e) => setPassword(e.target.value)} />
-            <button type="button" onClick={() => setShowPw((s) => !s)}
-              className="absolute top-1/2 right-3 -translate-y-1/2 cursor-pointer border-none bg-transparent text-[1.05rem]">
-              {showPw ? '🙈' : '👁'}
+            <button type="button" aria-label={showPw ? 'Hide password' : 'Show password'} onClick={() => setShowPw((s) => !s)}
+              className="absolute top-1/2 right-3 -translate-y-1/2 cursor-pointer border-none bg-transparent text-slate-500 hover:text-indigo-700">
+              {showPw ? <EyeOff aria-hidden="true" className="h-5 w-5" /> : <Eye aria-hidden="true" className="h-5 w-5" />}
             </button>
           </div>
         </FormField>
@@ -96,11 +101,11 @@ function LoginForm({ onClose, onSwitch })
         <Button type="submit" size="full" disabled={busy}>{busy ? 'Signing in…' : 'Sign In'}</Button>
       </form>
 
-      <div className="my-5 flex items-center gap-3 text-[.8rem] text-[#6679a3] before:h-px before:flex-1 before:bg-[rgba(120,145,210,.22)] after:h-px after:flex-1 after:bg-[rgba(120,145,210,.22)]">
+      <div className="my-5 flex items-center gap-3 text-[.8rem] text-slate-600 before:h-px before:flex-1 before:bg-[rgba(120,145,210,.22)] after:h-px after:flex-1 after:bg-[rgba(120,145,210,.22)]">
         or
       </div>
       <Button variant="google" size="full" onClick={handleGoogle}>Continue with Google</Button>
-      <div className="mt-5 text-center text-[.9rem] text-[#6679a3]">
+      <div className="mt-5 text-center text-[.9rem] text-slate-600">
         Don't have an account? <a className={linkCls} onClick={() => onSwitch('register')}>Register</a>
       </div>
     </>

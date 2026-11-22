@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useAuth } from '../../context/AuthContext'
+import { useERPData } from '../../hooks/useERPData'
 import { makeStamp } from '../../utils/stamp'
 import { money } from '../../utils/pricing'
 import Button from './Button'
@@ -7,9 +8,11 @@ import Modal from './Modal'
 import Alert from './Alert'
 import FormField from './FormField'
 import Tabs from './Tabs'
-import ActionButton from './ActionButton'
 import { DataTable, Td, Badge } from './DataTable'
 import { inputCls } from './styles'
+import ModuleKPIs from './ModuleKPIs'
+import IconActionButton from './IconActionButton'
+import { Eye, Pencil, RotateCcw, Trash2 } from 'lucide-react'
 
 // What a table cell shows for a field
 const shown = (f, r) => {
@@ -24,7 +27,7 @@ const text = (f, r) => {
   return typeof x === 'string' || typeof x === 'number' ? String(x) : ''
 }
 
-const disabledCls = 'disabled:bg-[rgba(220,230,250,.6)] disabled:text-[#6679a3] disabled:cursor-not-allowed'
+const disabledCls = 'disabled:bg-[rgba(220,230,250,.6)] disabled:text-slate-600 disabled:cursor-not-allowed'
 
 function RecordForm({ fields, fixed, mode, record, error, singular, onSubmit, onCancel }) {
   const formFields = fields.filter((f) => !f.virtual)
@@ -60,7 +63,7 @@ function RecordForm({ fields, fixed, mode, record, error, singular, onSubmit, on
                       value={values[f.name]} onChange={set(f.name)}
                     />
                   )}
-                  {hint && <p className="mt-1.5 text-[.8rem] text-[#6679a3]">{hint}</p>}
+                  {hint && <p className="mt-1.5 text-[.8rem] text-slate-600">{hint}</p>}
                 </FormField>
               </div>
             )
@@ -76,7 +79,7 @@ function RecordForm({ fields, fixed, mode, record, error, singular, onSubmit, on
 }
 
 /**
- * Generic list screen: search, Active/Deleted/All tabs, add, edit, soft-delete, restore.
+ * Generic list screen: search, Active/Deleted/All tabs, add, edit, restore, permanent delete.
  *
  * fields[]  { name, label, short, type: text|number|date|select, options, half, required,
  *             readOnlyOnEdit, hideInTable, virtual, render(record), hint(values), money, default }
@@ -87,14 +90,19 @@ function RecordForm({ fields, fixed, mode, record, error, singular, onSubmit, on
  * validate  (values, mode, record) => error string or ''
  */
 export default function RecordManager({
-  title, singular, records, setRecords, fields, keyOf, perms,
-  scope, fixed = {}, sort, extraActions, validate,
+  title, singular, records, setRecords, storageKey, fields, keyOf, perms,
+  scope, fixed = {}, sort, extraActions, validate, kpis,
 }) {
   const { can, currentUser } = useAuth()
+  const { deleteRecord } = useERPData()
   const [filter, setFilter] = useState('active')
   const [search, setSearch] = useState('')
   const [editing, setEditing] = useState(null) // { mode: 'add' | 'edit', record? }
+  const [viewing, setViewing] = useState(null)
+  const [deleting, setDeleting] = useState(null)
+  const [deletingBusy, setDeletingBusy] = useState(false)
   const [error, setError] = useState('')
+  const [notice, setNotice] = useState('')
 
   const columns = fields.filter((f) => !f.hideInTable)
   const q = search.trim().toLowerCase()
@@ -141,11 +149,28 @@ export default function RecordManager({
     )
   }
 
+  const confirmPermanentDelete = async () => {
+    if (!deleting || deletingBusy) return
+    setDeletingBusy(true)
+    setError('')
+    try {
+      const result = await deleteRecord(storageKey, deleting)
+      setDeleting(null)
+      setNotice(result?.warning ?? '')
+    } catch (deleteError) {
+      setError(deleteError.message)
+    } finally {
+      setDeletingBusy(false)
+    }
+  }
+
   return (
     <>
+      {kpis?.length > 0 && <ModuleKPIs items={kpis} />}
+      <Alert message={notice} />
       <div className="mb-[18px] flex flex-wrap items-center justify-between gap-3 print:hidden">
         {title && (
-          <h3 className={`font-extrabold tracking-[-.04em] ${title === 'Product Management' ? 'text-[2.2rem] leading-none text-[#1d2a4d]' : 'text-[1.3rem]'}`}>
+          <h3 className="text-lg leading-6 font-bold text-slate-900">
             {title}
           </h3>
         )}
@@ -163,34 +188,100 @@ export default function RecordManager({
         </div>
       </div>
 
-      <DataTable heads={[...columns.map((f) => f.short ?? f.label), 'Status', 'Stamp', 'Actions']}>
+      <DataTable heads={[
+        ...columns.map((f) => ({
+          label: f.short ?? f.label,
+          align: f.money || f.type === 'number' ? 'right' : 'left',
+        })),
+        'Status',
+        { label: 'Actions', align: 'right', className: 'sticky right-0 z-10 bg-white/80' },
+      ]}>
         {visible.length === 0 && (
-          <tr><td colSpan={columns.length + 3} className="px-5 py-14 text-center text-[#6679a3]">No records found.</td></tr>
+          <tr><td colSpan={columns.length + 2} className="px-5 py-14 text-center text-slate-600">No records found.</td></tr>
         )}
         {visible.map((r) => (
           <tr key={keyOf(r)} className={`group hover:bg-white/55 ${r.isDeleted ? 'bg-[rgba(229,72,77,.08)] opacity-85' : ''}`}>
             {columns.map((f, i) => (
-              <Td key={f.name}>{i === 0 ? <strong>{shown(f, r)}</strong> : shown(f, r)}</Td>
+              <Td key={f.name} className={`${f.type === 'date' ? 'whitespace-nowrap' : ''} ${f.money || f.type === 'number' ? 'text-right font-mono tabular-nums font-semibold' : ''}`}>
+                {i === 0 ? <strong>{shown(f, r)}</strong> : shown(f, r)}
+              </Td>
             ))}
             <Td><Badge deleted={r.isDeleted} /></Td>
-            <Td className="max-w-[200px] text-[.72rem] text-[#6679a3]">{r.stamp}</Td>
-            <Td>
-              <div className="flex flex-wrap gap-1.5">
+            <Td className={`sticky right-0 whitespace-nowrap ${r.isDeleted ? 'bg-rose-50/95' : 'bg-[#edf4ff]/95'} group-hover:bg-white`}>
+              <div className="flex items-center justify-end gap-0.5">
+                <IconActionButton icon={Eye} label={`View ${singular} details`} onClick={() => setViewing(r)} />
                 {!r.isDeleted && extraActions?.(r)}
                 {!r.isDeleted && can(perms.edit) && (
-                  <ActionButton onClick={() => setEditing({ mode: 'edit', record: r })}>Edit</ActionButton>
+                  <IconActionButton icon={Pencil} label={`Edit ${singular}`} onClick={() => setEditing({ mode: 'edit', record: r })} />
                 )}
                 {!r.isDeleted && can(perms.delete) && (
-                  <ActionButton tone="danger" onClick={() => setDeleted(r, true)}>Delete</ActionButton>
+                  <IconActionButton icon={Trash2} label={`Delete ${singular}`} tone="danger" onClick={() => setDeleted(r, true)} />
                 )}
                 {r.isDeleted && can(perms.delete) && (
-                  <ActionButton tone="success" onClick={() => setDeleted(r, false)}>Restore</ActionButton>
+                  <IconActionButton icon={RotateCcw} label={`Restore ${singular}`} tone="success" onClick={() => setDeleted(r, false)} />
+                )}
+                {r.isDeleted && can(perms.delete) && (
+                  <IconActionButton icon={Trash2} label="Permanent Delete" tone="danger" onClick={() => { setError(''); setNotice(''); setDeleting(r) }} />
                 )}
               </div>
             </Td>
           </tr>
         ))}
       </DataTable>
+
+      <Modal
+        open={!!viewing} onClose={() => setViewing(null)} size="lg"
+        title={`${singular} details`}
+        subtitle={viewing ? String(keyOf(viewing)) : ''}
+      >
+        {viewing && (
+          <dl className="grid grid-cols-2 gap-x-5 gap-y-4 max-[600px]:grid-cols-1">
+            {fields.filter((f) => !f.virtual).map((field) => {
+              const value = shown(field, viewing)
+              return (
+                <div key={field.name} className="min-w-0 border-b border-slate-200/70 pb-3">
+                  <dt className="text-xs font-bold uppercase tracking-wider text-slate-500">{field.label}</dt>
+                  <dd className="mt-1 break-words text-sm font-medium text-slate-800">
+                    {value === '' || value == null ? '—' : value}
+                  </dd>
+                </div>
+              )
+            })}
+            <div className="col-span-2 rounded-xl border border-white/60 bg-white/40 p-3 max-[600px]:col-span-1">
+              <dt className="text-xs font-bold uppercase tracking-wider text-slate-500">Audit metadata</dt>
+              <dd className="mt-1 text-sm text-slate-700">{viewing.stamp || 'No audit metadata available.'}</dd>
+            </div>
+          </dl>
+        )}
+      </Modal>
+
+      <Modal
+        open={!!deleting} onClose={() => { if (!deletingBusy) { setDeleting(null); setError('') } }} size="md"
+        title={`Permanently delete ${singular.toLowerCase()}?`}
+        subtitle="This action cannot be undone."
+      >
+        {deleting && (
+          <>
+            <Alert message={error} />
+            <p className="text-sm leading-6 text-slate-700">
+              This will permanently remove this record from the database. Its identifier
+              <strong className="mx-1 font-mono text-slate-900">{keyOf(deleting)}</strong>
+              will be available for reuse. Related records may prevent deletion.
+            </p>
+            <div className="mt-5 flex justify-end gap-2.5">
+              <Button
+                type="button" variant="secondary" disabled={deletingBusy}
+                onClick={() => { setDeleting(null); setError('') }}
+              >
+                Cancel
+              </Button>
+              <Button type="button" variant="danger" disabled={deletingBusy} onClick={confirmPermanentDelete}>
+                {deletingBusy ? 'Deleting…' : 'Permanently Delete'}
+              </Button>
+            </div>
+          </>
+        )}
+      </Modal>
 
       <Modal
         open={!!editing} onClose={close} size="lg"
