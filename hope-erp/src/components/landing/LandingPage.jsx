@@ -3,7 +3,9 @@ import Hero from './Hero'
 import Features from './Features'
 
 export default function LandingPage({ onOpen}) {
+
     return (
+        
         <div>
             <Navbar onOpen={onOpen} />
             <Hero onOpen={onOpen} />
