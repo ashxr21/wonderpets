@@ -7,6 +7,7 @@ import { inputCls } from '../ui/styles'
 import { useAuth } from '../../context/AuthContext'
 
 function RegisterForm({ onSwitch }) {
+  
   const { register } = useAuth()
   const empty = { firstName: '', lastName: '', email: '', password: '' }
   const [form, setForm] = useState(empty)
