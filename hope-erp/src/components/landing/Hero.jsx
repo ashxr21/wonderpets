@@ -31,10 +31,12 @@ export default function Hero({ onOpen }) {
         </p>
       </div>
 
+
       <div className="flex flex-wrap justify-center gap-3">
         <Button className="px-7 py-[13px] text-[1.02rem]" onClick={() => onOpen('login')}>Sign In to Dashboard</Button>
         <Button variant="outline" className="px-7 py-[13px] text-[1.02rem]" onClick={() => onOpen('register')}>Register</Button>
       </div>
+
 
       <div className="w-full">
         <div className="overflow-hidden rounded-[24px] border border-white/80 bg-white/30 shadow-[0_18px_34px_-20px_rgba(110,124,196,.4)] backdrop-blur-[8px]">
@@ -44,6 +46,7 @@ export default function Hero({ onOpen }) {
             </div>
             Hope, Inc. ERP Dashboard
           </div>
+
 
           <div className="grid grid-cols-4 gap-3 bg-[#ecf4ff]/80 p-5 max-[960px]:grid-cols-2 max-[600px]:grid-cols-1">
             {modules.map((m) => (
