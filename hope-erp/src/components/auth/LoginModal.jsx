@@ -23,32 +23,61 @@ function LoginForm({ onClose, onSwitch }) {
   
   const [busy, setBusy] = useState(false)
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e) => 
+
+    {
+
     e.preventDefault()
     setError('')
     setBusy(true)
-    try {
+
+    try 
+    {
+      
       const res = await login(email.trim(), password)
       if (!res.ok) return setError(res.error)
       onClose()
-    } catch (submitError) {
+
+    } 
+    
+    catch (submitError) 
+
+    {
+
       setError(submitError.message)
-    } finally {
+
+    } 
+
+    finally 
+
+    {
+
       setBusy(false)
+
     }
   }
 
-  const handleGoogle = async () => {
+  const handleGoogle = async () => 
+    {
+
     setError('')
-    try {
+    try 
+
+    {
+
       const res = await loginWithGoogle()
       if (!res.ok) setError(res.error)
-    } catch (loginError) {
+
+    } 
+    
+    catch (loginError) {
       setError(loginError.message)
+
     }
   }
 
-  return (
+  return 
+  (
     <>
       <Alert message={error} />
       <form onSubmit={handleSubmit}>
@@ -83,8 +112,12 @@ function LoginForm({ onClose, onSwitch }) {
   )
 }
 
-export default function LoginModal({ open, onClose, onSwitch }) {
-  return (
+export default function LoginModal({ open, onClose, onSwitch }) 
+
+{
+  
+  return 
+  (
     <Modal open={open} onClose={onClose} title="Welcome back" subtitle="Sign in to your Hope, Inc. ERP account">
       <LoginForm onClose={onClose} onSwitch={onSwitch} />
     </Modal>
