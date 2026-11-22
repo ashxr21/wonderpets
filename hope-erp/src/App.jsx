@@ -38,6 +38,8 @@ function Background() {
         return <div className="p-8 text-center text-slate-600">Connecting to Supabase…</div>
     }
 
+
+    
     return (
         <div className="min-h-screen font-sans leading-[1.55] text-slate-900">
         <Background />
@@ -47,6 +49,8 @@ function Background() {
                 {authError || dataError}
             </div>
         )}
+
+
 
         {currentUser ? (
             dataLoading
