@@ -3,13 +3,14 @@ import { useERPData } from '../../hooks/useERPData'
 import { glass } from '../ui/styles'
 import { money } from '../../utils/pricing'
 import { KEYS } from '../../data/defaults'
+import { BarChart3, Briefcase, Package, TrendingUp, Users } from 'lucide-react'
 
 const shortcuts = [
-  { id: 'customers', label: '👥 Customers' },
-  { id: 'products', label: '📦 Products' },
-  { id: 'hr', label: '🧑‍💼 HR Records' },
-  { id: 'sales', label: '📈 Sales Pipeline' },
-  { id: 'reports', label: '📊 Reports' },
+  { id: 'customers', label: 'Customers', icon: Users },
+  { id: 'products', label: 'Products', icon: Package },
+  { id: 'hr', label: 'HR Records', icon: Briefcase },
+  { id: 'sales', label: 'Sales Pipeline', icon: TrendingUp },
+  { id: 'reports', label: 'Reports', icon: BarChart3 },
 ]
 
 export default function DashboardHome({ onNavigate }) {
@@ -49,7 +50,7 @@ export default function DashboardHome({ onNavigate }) {
       <div className="mb-[18px] grid grid-cols-4 gap-4 max-[960px]:grid-cols-2 max-[600px]:grid-cols-1">
         {stats.map((s) => (
           <div key={s.label} className={`${glass} flex flex-col gap-1.5 rounded-[22px] p-[22px]`}>
-            <div className="text-[.75rem] font-bold uppercase text-[#6679a3]">{s.label}</div>
+            <div className="text-[.75rem] font-bold uppercase text-slate-600">{s.label}</div>
             <div className="text-[2rem] font-extrabold">{s.value}</div>
             <div className="text-[.8rem] font-semibold text-[#12b886]">{s.change}</div>
           </div>
@@ -57,9 +58,11 @@ export default function DashboardHome({ onNavigate }) {
       </div>
 
       <div className={`${glass} mb-[18px] rounded-[22px] p-6`}>
-        <h3 className="mb-4 text-[1.05rem] font-extrabold">Quick Actions</h3>
+        <h3 className="mb-4 text-lg leading-6 font-bold">Quick Actions</h3>
         <div className="grid grid-cols-[repeat(auto-fill,minmax(190px,1fr))] gap-3">
-          {shortcuts.map((s) => (
+          {shortcuts.map((s) => {
+            const Icon = s.icon
+            return (
             <button
               key={s.id}
               onClick={() => onNavigate(s.id)}
@@ -67,9 +70,11 @@ export default function DashboardHome({ onNavigate }) {
                 text-[.9rem] font-semibold text-[#1d2a4d] transition-all duration-150
                 hover:-translate-y-0.5 hover:bg-white hover:shadow-[0_12px_24px_-14px_rgba(70,100,220,.6)]"
             >
+              <Icon aria-hidden="true" className="h-5 w-5 text-indigo-600" strokeWidth={1.8} />
               {s.label}
             </button>
-          ))}
+            )
+          })}
         </div>
       </div>
     </>
