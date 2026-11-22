@@ -5,31 +5,15 @@ import Alert from '../ui/Alert'
 import FormField from '../ui/FormField'
 import { inputCls } from '../ui/styles'
 
-function ResetForm({ onSwitch }) {
-  const { requestPasswordReset } = useAuth()
+function ResetForm({ onSwitch }) 
+  {
   const [email, setEmail] = useState('')
 
   const [success, setSuccess] = useState('')
-  const [error, setError] = useState('')
-  const [busy, setBusy] = useState(false)
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault()
-    setSuccess('')
-    setError('')
-    setBusy(true)
-    try {
-      const result = await requestPasswordReset(email.trim())
-      if (!result.ok) {
-        setError(result.error)
-        return
-      }
-      setSuccess(`If an account exists for ${email.trim()}, a reset link has been sent.`)
-    } catch (submitError) {
-      setError(submitError.message)
-    } finally {
-      setBusy(false)
-    }
+    setSuccess(`If an account exists for ${email.trim()}, a reset link has been sent.`)
   }
 
   return (
