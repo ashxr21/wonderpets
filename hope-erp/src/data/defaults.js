@@ -77,22 +77,37 @@ export const DEFAULT_DEPTS = [
 ].map(rec)
 
 export const DEFAULT_JOB_HISTORY = [
+ 
   { empNo: 'E-001', effDate: '2022-03-01', salary: 30000, jobCode: 'J-001', deptCode: 'D-001' },
+ 
   { empNo: 'E-001', effDate: '2024-01-01', salary: 38000, jobCode: 'J-002', deptCode: 'D-001' },
+ 
   { empNo: 'E-002', effDate: '2021-06-15', salary: 45000, jobCode: 'J-002', deptCode: 'D-001' },
+ 
   { empNo: 'E-003', effDate: '2023-02-10', salary: 32000, jobCode: 'J-003', deptCode: 'D-002' },
+
 ].map(rec)
 
 export const DEFAULT_SALES = [
+  
   { transNo: 'T-001', salesDate: '2026-10-05', custNo: 'C-001', empNo: 'E-001' },
+  
   { transNo: 'T-002', salesDate: '2026-10-12', custNo: 'C-002', empNo: 'E-002' },
+  
   { transNo: 'T-003', salesDate: '2026-10-20', custNo: 'C-001', empNo: 'E-001' },
+
 ].map(rec)
 
 export const DEFAULT_SALES_DETAIL = [
+
   { transNo: 'T-001', prodCode: 'P-001', qty: 10 },
+
   { transNo: 'T-001', prodCode: 'P-002', qty: 4 },
+
   { transNo: 'T-002', prodCode: 'P-003', qty: 5 },
+
   { transNo: 'T-002', prodCode: 'P-001', qty: 6 },
+
   { transNo: 'T-003', prodCode: 'P-002', qty: 8 },
+
 ].map(rec)
