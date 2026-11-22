@@ -1,11 +1,12 @@
 import Button from '../ui/Button'
 import { glass, gradBg } from '../ui/styles'
+import { Briefcase, Package, TrendingUp, Users } from 'lucide-react'
 
 const modules = [
-  { icon: '👥', title: 'Customers', text: 'Manage contacts & accounts', color: 'bg-[#dffaf5] text-[#1d685e]' },
-  { icon: '📦', title: 'Products', text: 'Catalog & inventory', color: 'bg-[#e7fdf0] text-[#1d6a3c]' },
-  { icon: '🧑‍💼', title: 'Human Resources', text: 'Employees & payroll', color: 'bg-[#fff3d9] text-[#9b6a1c]' },
-  { icon: '📈', title: 'Sales', text: 'Orders & revenue', color: 'bg-[#fceaf5] text-[#a4325e]' }
+  { icon: Users, title: 'Customers', text: 'Manage contacts & accounts', color: 'bg-indigo-50 text-indigo-600' },
+  { icon: Package, title: 'Products', text: 'Catalog & inventory', color: 'bg-indigo-50 text-indigo-600' },
+  { icon: Briefcase, title: 'Human Resources', text: 'Employees & payroll', color: 'bg-indigo-50 text-indigo-600' },
+  { icon: TrendingUp, title: 'Sales', text: 'Orders & revenue', color: 'bg-indigo-50 text-indigo-600' }
 ]
 
 export default function Hero({ onOpen }) {
@@ -21,7 +22,7 @@ export default function Hero({ onOpen }) {
             <span className={`${gradBg} bg-clip-text text-transparent`}>with confidence</span>
           </span>
         </h1>
-        <p className="mx-auto max-w-[620px] text-[1.08rem] leading-[1.6] text-[#5c6c8b]">
+        <p className="mx-auto max-w-[620px] text-[1.08rem] leading-[1.6] text-slate-700">
           Hope, Inc. ERP unifies Customer Management, Product Catalog, Human Resources,
           and Sales into one powerful platform. Built for teams of every size.
         </p>
@@ -44,9 +45,11 @@ export default function Hero({ onOpen }) {
           <div className="grid grid-cols-4 gap-3 bg-[#ecf4ff]/80 p-5 max-[960px]:grid-cols-2 max-[600px]:grid-cols-1">
             {modules.map((m) => (
               <div key={m.title} className="flex flex-col gap-2 rounded-[16px] border border-[#edf2ff] bg-white/80 p-[18px] text-left shadow-[inset_0_1px_0_rgba(255,255,255,.75)]">
-                <div className={`flex h-[42px] w-[42px] items-center justify-center rounded-[12px] text-[1.25rem] ${m.color}`}>{m.icon}</div>
+                <div className={`flex h-[42px] w-[42px] items-center justify-center rounded-[12px] ${m.color}`}>
+                  <m.icon aria-hidden="true" className="h-5 w-5" strokeWidth={1.8} />
+                </div>
                 <h4 className="text-[1rem] font-bold tracking-[-0.02em] text-[#25314d]">{m.title}</h4>
-                <p className="text-[0.8rem] leading-[1.5] text-[#5d6d8d]">{m.text}</p>
+                <p className="text-[0.8rem] leading-[1.5] text-slate-600">{m.text}</p>
               </div>
             ))}
           </div>

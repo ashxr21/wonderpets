@@ -5,9 +5,11 @@
     KEYS,
     } from '../../data/defaults'
     import RecordManager from '../ui/RecordManager'
-    import ActionButton from '../ui/ActionButton'
     import Modal from '../ui/Modal'
     import Tabs from '../ui/Tabs'
+    import ModuleKPIs from '../ui/ModuleKPIs'
+    import IconActionButton from '../ui/IconActionButton'
+    import { Briefcase, BriefcaseBusiness, Building2, UserCheck, Users } from 'lucide-react'
 
     const GENDERS = [
     { value: 'M', label: 'Male' },
@@ -52,6 +54,13 @@
 
     const jobOptions = jobs.filter((j) => !j.isDeleted).map((j) => ({ value: j.jobCode, label: `${j.jobCode} – ${j.jobDesc}` }))
     const deptOptions = depts.filter((d) => !d.isDeleted).map((d) => ({ value: d.deptCode, label: `${d.deptCode} – ${d.deptName}` }))
+    const activeEmployees = employees.filter((e) => !e.isDeleted && (!e.sepDate || e.sepDate > new Date().toISOString().slice(0, 10)))
+    const hrKpis = [
+        { label: 'Total employees', value: employees.filter((e) => !e.isDeleted).length, icon: Users, tone: 'indigo' },
+        { label: 'Active employees', value: activeEmployees.length, icon: UserCheck, tone: 'emerald' },
+        { label: 'Job titles', value: jobs.filter((j) => !j.isDeleted).length, icon: BriefcaseBusiness, tone: 'blue' },
+        { label: 'Departments', value: depts.filter((d) => !d.isDeleted).length, icon: Building2, tone: 'purple' },
+    ]
 
     const historyFields = [
         { name: 'empNo', label: 'Employee No.', hideInTable: true },
@@ -63,6 +72,7 @@
 
     return (
         <>
+        <ModuleKPIs items={hrKpis} />
         <div className="mb-4">
             <Tabs
             value={tab} onChange={setTab}
@@ -78,11 +88,12 @@
             <RecordManager
             title="Employees" singular="Employee"
             records={employees} setRecords={setEmployees}
+            storageKey={KEYS.employees}
             fields={employeeFields} keyOf={(r) => r.empNo}
             perms={{ add: 'hr.empAdd', edit: 'hr.empEdit', delete: 'hr.empDelete' }}
             validate={validateEmployee}
             extraActions={(r) =>
-                can('hr.jhView') && <ActionButton onClick={() => setHistFor(r)}>Job History</ActionButton>
+                can('hr.jhView') && <IconActionButton icon={Briefcase} label={`Job history for ${r.empNo}`} onClick={() => setHistFor(r)} />
             }
             />
         )}
@@ -91,6 +102,7 @@
             <RecordManager
             title="Jobs" singular="Job"
             records={jobs} setRecords={setJobs}
+            storageKey={KEYS.jobs}
             fields={jobFields} keyOf={(r) => r.jobCode}
             perms={{ add: 'hr.jobAdd', edit: 'hr.jobEdit', delete: 'hr.jobDelete' }}
             />
@@ -100,6 +112,7 @@
             <RecordManager
             title="Departments" singular="Department"
             records={depts} setRecords={setDepts}
+            storageKey={KEYS.depts}
             fields={deptFields} keyOf={(r) => r.deptCode}
             perms={{ add: 'hr.deptAdd', edit: 'hr.deptEdit', delete: 'hr.deptDelete' }}
             />
@@ -114,6 +127,7 @@
             <RecordManager
                 singular="Job History"
                 records={history} setRecords={setHistory}
+                storageKey={KEYS.jobHistory}
                 fields={historyFields} keyOf={(r) => `${r.empNo}|${r.effDate}`}
                 perms={{ add: 'hr.jhAdd', edit: 'hr.jhEdit', delete: 'hr.jhDelete' }}
                 scope={(r) => r.empNo === histFor.empNo}

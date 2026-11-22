@@ -7,6 +7,7 @@ import RegisterModal from './components/auth/RegisterModal'
 import ResetModal from './components/auth/ResetModal'
 import UpdatePasswordModal from './components/auth/UpdatePasswordModal'
 import { useERPData } from './hooks/useERPData'
+import { Sparkles } from 'lucide-react'
 
 // Fixed gradient backdrop + two decorative orbs (replaces body background / ::before / ::after)
 function Background() {
@@ -34,11 +35,11 @@ function Background() {
     const close = () => setModal(null)
 
     if (!authReady) {
-        return <div className="p-8 text-center text-[#6679a3]">Connecting to Supabase…</div>
+        return <div className="p-8 text-center text-slate-600">Connecting to Supabase…</div>
     }
 
     return (
-        <div className="min-h-screen font-sans leading-[1.55] text-[#1d2a4d]">
+        <div className="min-h-screen font-sans leading-[1.55] text-slate-900">
         <Background />
 
         {(authError || dataError) && (
@@ -49,13 +50,13 @@ function Background() {
 
         {currentUser ? (
             dataLoading
-                ? <div className="p-8 text-center text-[#6679a3]">Loading your ERP data…</div>
+                ? <div className="p-8 text-center text-slate-600">Loading your ERP data…</div>
                 : <DashboardLayout />
         ) : (
             <>
             <LandingPage onOpen={setModal} />
-            <div className="fixed bottom-6 right-6 z-20 flex h-12 w-12 items-center justify-center rounded-full border border-white/80 bg-linear-to-br from-[#f7d4f1] via-[#d4dcff] to-[#a7d0ff] shadow-[0_14px_30px_-12px_rgba(128,126,222,.7)] text-lg font-bold text-[#3657d7] backdrop-blur-sm">
-                ✦
+            <div aria-hidden="true" className="fixed bottom-6 right-6 z-20 flex h-12 w-12 items-center justify-center rounded-full border border-white/50 bg-linear-to-br from-[#f7d4f1] via-[#d4dcff] to-[#a7d0ff] shadow-[0_14px_30px_-12px_rgba(128,126,222,.7)] text-[#3657d7] backdrop-blur-sm">
+                <Sparkles className="h-5 w-5" />
             </div>
             <LoginModal open={modal === 'login'} onClose={close} onSwitch={setModal} />
             <RegisterModal open={modal === 'register'} onClose={close} onSwitch={setModal} />
