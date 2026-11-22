@@ -3,6 +3,7 @@ import {
   BarChart3, Briefcase, ChevronLeft, ChevronRight, LayoutDashboard,
   LogOut, Package, ShieldCheck, TrendingUp, Users,
 } from 'lucide-react'
+
 import { useAuth } from '../../context/AuthContext'
 import { glass, gradBg } from '../ui/styles'
 
@@ -24,6 +25,7 @@ const NAV = [
 const MODULE_IDS = ['customers', 'products', 'hr', 'sales', 'reports']
 
 export default function Sidebar({ page, onNavigate }) {
+
   const { currentUser, canModule, logout } = useAuth()
   const [collapsed, setCollapsed] = useState(false)
 
@@ -34,6 +36,7 @@ export default function Sidebar({ page, onNavigate }) {
   }
 
   return (
+
     <aside
       className={`${glass} sticky top-4 flex h-[calc(100vh-32px)] shrink-0 flex-col rounded-[28px] transition-[width] duration-200
         ${collapsed ? 'w-[76px]' : 'w-64'} max-[600px]:static max-[600px]:h-auto max-[600px]:w-full max-[600px]:flex-row`}
@@ -114,6 +117,7 @@ export default function Sidebar({ page, onNavigate }) {
               <LogOut aria-hidden="true" className="h-4 w-4 text-slate-500" />
             </>
           )}
+
         </button>
       </div>
     </aside>
