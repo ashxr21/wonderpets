@@ -7,11 +7,17 @@ import { inputCls } from '../ui/styles'
 import { useAuth } from '../../context/AuthContext'
 
 function RegisterForm({ onSwitch }) {
+
   const { register } = useAuth()
+
   const empty = { firstName: '', lastName: '', email: '', password: '' }
+
   const [form, setForm] = useState(empty)
+
   const [error, setError] = useState('')
+
   const [success, setSuccess] = useState('')
+  
   const [busy, setBusy] = useState(false)
 
   const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }))
