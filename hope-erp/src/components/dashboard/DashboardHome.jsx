@@ -14,6 +14,7 @@ const shortcuts = [
 ]
 
 export default function DashboardHome({ onNavigate }) {
+  
   const { currentUser } = useAuth()
   const { collections } = useERPData()
   const customers = collections[KEYS.customers]
