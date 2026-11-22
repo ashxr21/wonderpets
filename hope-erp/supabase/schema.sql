@@ -24,6 +24,23 @@ create table if not exists public.erp_records (
   unique (collection, record_key)
 );
 
+create table if not exists public.deletion_logs (
+  id uuid primary key default gen_random_uuid(),
+  module text not null check (module in (
+    'Customers', 'Products', 'Employees', 'Jobs', 'Departments', 'Sales'
+  )),
+  record_id text not null,
+  record_summary text not null,
+  deleted_data jsonb not null check (jsonb_typeof(deleted_data) = 'object'),
+  deleted_by text not null,
+  deleted_at timestamptz not null default now(),
+  created_by uuid not null default auth.uid(),
+  pending boolean not null default false
+);
+
+create index if not exists deletion_logs_deleted_at_idx
+  on public.deletion_logs (deleted_at desc);
+
 alter table public.erp_records
   drop constraint if exists erp_records_collection_check;
 alter table public.erp_records
@@ -259,6 +276,7 @@ $$;
 
 alter table public.profiles enable row level security;
 alter table public.erp_records enable row level security;
+alter table public.deletion_logs enable row level security;
 
 drop policy if exists "Profiles can be read by self or admins" on public.profiles;
 create policy "Profiles can be read by self or admins"
@@ -287,6 +305,81 @@ create policy "Update permitted ERP records"
     or public.can_access_erp_record(collection, 'delete')
   );
 
+drop policy if exists "Delete permitted ERP records" on public.erp_records;
+create policy "Delete permitted ERP records"
+  on public.erp_records for delete to authenticated
+  using (public.can_access_erp_record(collection, 'delete'));
+
+drop policy if exists "Read permitted deletion logs" on public.deletion_logs;
+create policy "Read permitted deletion logs"
+  on public.deletion_logs for select to authenticated
+  using (
+    created_by = (select auth.uid())
+    or exists (
+      select 1
+      from public.profiles p
+      where p.id = (select auth.uid())
+        and p.status = 'active'
+        and (
+          p.role in ('admin', 'superadmin')
+        )
+    )
+  );
+
+drop policy if exists "Insert own deletion logs" on public.deletion_logs;
+create policy "Insert own deletion logs"
+  on public.deletion_logs for insert to authenticated
+  with check (
+    created_by = (select auth.uid())
+    and exists (
+      select 1
+      from public.profiles p
+      where p.id = (select auth.uid())
+        and p.status = 'active'
+        and p.email = deleted_by
+      and pending
+      and case module
+        when 'Customers' then public.can_access_erp_record('customers', 'delete')
+        when 'Products' then public.can_access_erp_record('products', 'delete')
+          or public.can_access_erp_record('prices', 'delete')
+        when 'Employees' then public.can_access_erp_record('employees', 'delete')
+          or public.can_access_erp_record('job_history', 'delete')
+        when 'Jobs' then public.can_access_erp_record('jobs', 'delete')
+        when 'Departments' then public.can_access_erp_record('departments', 'delete')
+        when 'Sales' then public.can_access_erp_record('sales', 'delete')
+          or public.can_access_erp_record('sales_details', 'delete')
+          or public.can_access_erp_record('payments', 'delete')
+        else false
+      end
+    )
+  );
+
+drop policy if exists "Rollback own deletion logs" on public.deletion_logs;
+create policy "Rollback own deletion logs"
+  on public.deletion_logs for delete to authenticated
+  using (
+    created_by = (select auth.uid())
+    and pending
+    and exists (
+      select 1
+      from public.profiles p
+      where p.id = (select auth.uid())
+        and p.status = 'active'
+    )
+  );
+
+drop policy if exists "Complete own deletion logs" on public.deletion_logs;
+create policy "Complete own deletion logs"
+  on public.deletion_logs for update to authenticated
+  using (
+    created_by = (select auth.uid())
+    and pending
+  )
+  with check (
+    created_by = (select auth.uid())
+    and not pending
+  );
+
 revoke all on function public.create_erp_profile() from public, anon, authenticated;
 revoke all on function public.is_active_erp_admin() from public, anon;
 revoke all on function public.can_access_erp_record(text, text) from public, anon;
@@ -298,4 +391,6 @@ grant execute on function public.can_access_erp_record(text, text) to authentica
 grant execute on function public.can_read_erp_collection(text) to authenticated;
 grant execute on function public.manage_erp_profile(uuid, text, text, text, text, jsonb) to authenticated;
 grant select on public.profiles to authenticated;
-grant select, insert, update on public.erp_records to authenticated;
+grant select, insert, update, delete on public.erp_records to authenticated;
+grant select, insert, delete on public.deletion_logs to authenticated;
+grant update (pending) on public.deletion_logs to authenticated;

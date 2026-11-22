@@ -43,7 +43,7 @@ function ResetForm({ onSwitch }) {
         </FormField>
         <Button type="submit" size="full" disabled={busy}>{busy ? 'Sending…' : 'Send Reset Link'}</Button>
       </form>
-      <div className="mt-5 text-center text-[.9rem] text-[#6679a3]">
+      <div className="mt-5 text-center text-[.9rem] text-slate-600">
         Remember password?{' '}
         <a className="cursor-pointer font-semibold text-[#4468d8] hover:underline" onClick={() => onSwitch('login')}>Back to Sign In</a>
       </div>

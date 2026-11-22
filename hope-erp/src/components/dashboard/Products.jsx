@@ -2,8 +2,10 @@ import { useState } from 'react'
 import { useERPCollection } from '../../hooks/useERPData'
 import { KEYS } from '../../data/defaults'
 import RecordManager from '../ui/RecordManager'
-import ActionButton from '../ui/ActionButton'
 import Modal from '../ui/Modal'
+import ModuleKPIs from '../ui/ModuleKPIs'
+import IconActionButton from '../ui/IconActionButton'
+import { Boxes, CircleDollarSign, DollarSign, PackageCheck, Tags } from 'lucide-react'
 
 const productFields = [
   { name: 'prodCode', label: 'Product Code', short: 'Prod Code', placeholder: 'e.g. P-001', readOnlyOnEdit: true },
@@ -21,15 +23,26 @@ export default function Products() {
   const [products, setProducts] = useERPCollection(KEYS.products)
   const [prices, setPrices] = useERPCollection(KEYS.prices)
   const [priceFor, setPriceFor] = useState(null) // product whose price history is open
+  const activeProducts = products.filter((p) => !p.isDeleted)
+  const activePrices = prices.filter((p) => !p.isDeleted)
+  const pricedProductCount = new Set(activePrices.map((p) => p.prodCode)).size
+  const productKpis = [
+    { label: 'Total products', value: products.length, icon: Boxes, tone: 'indigo' },
+    { label: 'Active products', value: activeProducts.length, icon: PackageCheck, tone: 'emerald' },
+    { label: 'Products with pricing', value: pricedProductCount, icon: Tags, tone: 'blue' },
+    { label: 'Price records', value: activePrices.length, icon: CircleDollarSign, tone: 'emerald' },
+  ]
 
   return (
     <>
+      <ModuleKPIs items={productKpis} />
       <RecordManager
         title="Product Management" singular="Product"
         records={products} setRecords={setProducts}
+        storageKey={KEYS.products}
         fields={productFields} keyOf={(r) => r.prodCode}
         perms={{ add: 'products.add', edit: 'products.edit', delete: 'products.delete' }}
-        extraActions={(r) => <ActionButton onClick={() => setPriceFor(r)}>Prices</ActionButton>}
+        extraActions={(r) => <IconActionButton icon={DollarSign} label={`Price history for ${r.prodCode}`} onClick={() => setPriceFor(r)} />}
       />
 
       <Modal
@@ -41,6 +54,7 @@ export default function Products() {
           <RecordManager
             singular="Price"
             records={prices} setRecords={setPrices}
+            storageKey={KEYS.prices}
             fields={priceFields} keyOf={(r) => `${r.prodCode}|${r.effDate}`}
             perms={{ add: 'products.priceAdd', edit: 'products.priceEdit', delete: 'products.priceDelete' }}
             scope={(r) => r.prodCode === priceFor.prodCode}
