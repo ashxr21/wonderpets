@@ -2,6 +2,7 @@ import { glass } from '../ui/styles'
 import { Briefcase, Package, TrendingUp, Users } from 'lucide-react'
 
 const features = [
+
   { icon: Users, title: 'Customer Management', text: 'Track leads, accounts, contacts, and interaction history in one place.', color: 'bg-indigo-50 text-indigo-600' },
   { icon: Package, title: 'Product Management', text: 'Maintain product catalog, pricing, stock levels, and categories.', color: 'bg-indigo-50 text-indigo-600' },
   { icon: Briefcase, title: 'Human Resources', text: 'Employee records, attendance, leave, and organizational structure.', color: 'bg-indigo-50 text-indigo-600' },
@@ -9,7 +10,9 @@ const features = [
 ]
 
 export default function Features() {
+
   return (
+    
     <section className="mx-auto max-w-[1100px] px-6 pt-[30px] pb-[90px]">
       <div className="mb-9 text-center">
         <h2 className="mb-2 text-[2rem] font-extrabold tracking-[-.02em]">Everything you need to grow</h2>
