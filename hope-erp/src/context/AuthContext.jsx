@@ -166,6 +166,12 @@ export function AuthProvider({ children }) {
   const updatePassword = async (password) => {
     const { error } = await supabase.auth.updateUser({ password })
     if (error) return { ok: false, error: error.message }
+
+    const { error: signOutError } = await supabase.auth.signOut()
+    if (signOutError) return { ok: false, error: `Password updated, but could not sign out: ${signOutError.message}` }
+
+    setCurrentUser(null)
+    setUsers([])
     setPasswordRecovery(false)
     return { ok: true }
   }
