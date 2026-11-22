@@ -13,8 +13,7 @@ export default function Customers() {
     <MasterDataModule
       title="Customer Management" singular="Customer"
       storageKey={KEYS.customers}
-      fields={fields} keyOf={(r) => r.custNo}
-      perms={{ add: 'customers.add', edit: 'customers.edit', delete: 'customers.delete' }}
+      fields={fields} keyField="custNo" permPrefix="customers"
     />
   )
 }
