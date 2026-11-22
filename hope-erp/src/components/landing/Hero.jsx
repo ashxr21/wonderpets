@@ -3,6 +3,7 @@ import { glass, gradBg } from '../ui/styles'
 import { Briefcase, Package, TrendingUp, Users } from 'lucide-react'
 
 const modules = [
+  
   { icon: Users, title: 'Customers', text: 'Manage contacts & accounts', color: 'bg-indigo-50 text-indigo-600' },
   { icon: Package, title: 'Products', text: 'Catalog & inventory', color: 'bg-indigo-50 text-indigo-600' },
   { icon: Briefcase, title: 'Human Resources', text: 'Employees & payroll', color: 'bg-indigo-50 text-indigo-600' },
@@ -10,7 +11,9 @@ const modules = [
 ]
 
 export default function Hero({ onOpen }) {
+
   return (
+
     <section
       className={`${glass} mx-auto mt-[110px] mb-10 flex max-w-[1100px] flex-col items-center gap-10
         rounded-[38px] border border-white/80 bg-white/20 px-10 pb-10 pt-12 text-center shadow-[0_22px_70px_-22px_rgba(94,116,208,.35)] max-[960px]:px-[22px] max-[960px]:pt-10 max-[960px]:pb-8`}
